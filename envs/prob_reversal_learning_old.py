@@ -3,19 +3,20 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 
 
-class ProbReversalEnv():
+class NonStationaryEnv():
     ''' Nonstationary environment where the reward probabilities or values change after certain trials.
     Rewards are sampled from ~N(mean, std) with specified probabilities.'''
     def __init__(self, num_arms, mean_reward, std, 
                  probabilities,
                  mean_rew_change=None, std_change=None, 
                  probabilities_change=None,
-                 time_stamp_change=None,
+                 stationary=False, time_stamp_change=None,
                  change_type='both'):
         self.num_arms = num_arms
         self.mean_reward = mean_reward
         self.std = std
         self.probabilities = probabilities
+        self.stationary = stationary
         
         # Parameters for change
         self.mean_rew_change = mean_reward if mean_rew_change is None else mean_rew_change
@@ -30,13 +31,11 @@ class ProbReversalEnv():
         assert self.num_arms == self.mean_reward.shape[0] == self.std.shape[0], 'Invalid shape of mean_reward or std array'
         assert self.num_arms == self.probabilities.shape[0], 'Invalid shape of probabilities array'
         
-        if self.time_stamp_change is not None:
+        if not stationary and time_stamp_change is not None:
             if self.change_type in ['reward', 'both']:
                 assert self.num_arms == self.mean_rew_change.shape[0] == self.std_change.shape[0], 'Invalid shape of mean_rew_change or std_change array'
             if self.change_type in ['probability', 'both']:
                 assert self.num_arms == self.probabilities_change.shape[0], 'Invalid shape of probabilities_change array'
-        else:
-            assert self.time_stamp_change is None, 'Invalid value for time_stamp_change'
         
         # Generate reward probability timestamps
         self.rew_timestamps = self.create_rew_timepoints()
@@ -79,7 +78,7 @@ class ProbReversalEnv():
         return binary_dict
 
     def step(self, chosen_arm):
-        if  self.step_counter >= self.time_stamp_change:
+        if not self.stationary and self.step_counter >= self.time_stamp_change:
             # Apply changes based on change_type
             if self.change_type in ['reward', 'both']:
                 self.arms = dict(enumerate(zip(self.mean_rew_change, self.std_change)))

@@ -11,14 +11,14 @@ inter_sparse : 0.1
 
 # STN-GPe params
 I_strd2_gpe : 5
-lat_strength_stn : 0.0275
+lat_strength_stn : 0.02
 lat_strength_gpe : 0.1
 wsg_strength : 0.1
 wgs_strength : 0.1
 I_gpe_ext : 6
 I_stn_ext : 12
 binsize : 100
-stn_gpe_noise: 0
+stn_gpe_noise: 3
 
 # DBS Params
 DBS : False
@@ -28,7 +28,7 @@ DBS_freq : 130
 DBS_duty : 0.052 #26 #0.026
 DBS_A1 : 250
 DBS_A2 : -250
-pulseinterval : 0
+pulseinterval : 10
 sector_wise : False
 t_sector_activation : 100 #* 0.1 ms
 

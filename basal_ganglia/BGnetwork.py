@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import sys
@@ -6,8 +5,7 @@ import os
 
 
 class BGNetwork(nn.Module):
-    def __init__(self, STN_neurons, max_gpi_iters, d1_amp, d2_amp, gpi_threshold, seed = None,num_arms = 4,
-                 gpi_var = 1e-4, gpi_mean = 0.5):
+    def __init__(self, max_gpi_iters, d1_amp, d2_amp, gpi_threshold, seed = None,num_arms = 4,STN_neurons = 256):
         super(BGNetwork, self).__init__()
         # env 
         # Number of IGT arms
@@ -21,8 +19,6 @@ class BGNetwork(nn.Module):
         self.max_gpi_iters = max_gpi_iters
         self.STN_neurons = STN_neurons
         self.seed = seed
-        self.gpi_var = gpi_var
-        self.gpi_mean = gpi_mean
         self.input = torch.ones(1,self.num_arms)
 
         self.str_d1 = nn.Linear(in_features=self.num_arms,out_features=self.num_arms)
@@ -64,7 +60,7 @@ class BGNetwork(nn.Module):
     def forward(self,stn_input):
         '''
         Args:
-        stn_input(torch.tensor): shape (1, time_points, num_neurons)
+        stn_input(torch.tensor): shape (1, time_points, num_neurons = 4)
         '''
         time_points = self.max_gpi_iters 
         assert time_points >= self.max_gpi_iters, "Number of timepoints is smaller than max iters"
@@ -73,14 +69,8 @@ class BGNetwork(nn.Module):
         D1_output = self.D1_pathway(self.input)
         value = self.snc(D1_output)
         t = 0
-        std = self.gpi_var 
-        mean = self.gpi_mean 
         while t < time_points:
-            # D2_output = self.D2_pathway(stn_input[:,t,:])
-            #torch.randn((1,self.num_arms), requires_grad= False) * std + mean #SHAPE(1,4)
-            # self.d2_amp = self.d2_amp * 0.99
-            D2_output = torch.randn((1,self.num_arms), requires_grad= False) * std + mean #stn_input[:,t,:] 
-            
+            D2_output = stn_input[:,t,:] 
             # running race model: 
             v_gpi = v_gpi + (self.dt/self.tau_gpi) * (-v_gpi - self.d1_amp *D1_output + torch.round(self.d2_amp *D2_output, decimals = 2))
             v_gpi_out = -v_gpi
@@ -93,4 +83,4 @@ class BGNetwork(nn.Module):
         dp_output = self.d1_amp * D1_output
         ip_output =  torch.round(self.d2_amp *D2_output, decimals = 2)
 
-        return v_gpi_out, t, dp_output, ip_output,value
+        return v_gpi_out, t, dp_output, ip_output

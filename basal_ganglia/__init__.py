@@ -5,7 +5,7 @@ Contains BG network model, train loop
 for studying decision-making under different conditions
 """
 
-from .BGnetwork import BGNetwork
+from .BGNetwork import BGNetwork
 from .train import train
 
 

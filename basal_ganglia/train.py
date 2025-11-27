@@ -1,42 +1,34 @@
+import sys, os
+
+project_root = os.path.abspath(os.path.join(os.getcwd(), "../../.."))
+
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+from stn_gpe import *
 from .BGNetwork import BGNetwork
 import torch
 import numpy as np
 from tqdm.autonotebook import tqdm
 import yaml
 
+
 def update_epsilon(ep_old,TD_error,alpha_ep, eta_ep, baseline_val = 0.02):
     ep = ep_old + alpha_ep * (1- torch.exp((-TD_error**2)/eta_ep) - ep_old) + baseline_val
     return ep.item()
 
-def run_STN_GPe_system(ep, osc_no,m = 0.6, c = 0.3,time_sec = 5.5, k_lim = None):
-    pass  
-    # with open(r'BasalGanglia\params.yaml','r') as file:
-    #     data = yaml.safe_load(file)
-    # omega =np.ones((data['N'],1))*data['omega']   
-    # if k_lim is None: 
-    #     k = m * ep + c
-    # else:
-    #     k = k_lim
-    # RN = RosslerNetwork(N = data['N'], 
-    #                 a = data['a'],
-    #                 b = data['b'], 
-    #                 c = data['c'], 
-    #                 d = data['d'], 
-    #                 k = k,
-    #                 omega= omega, 
-    #                 Iext=data['Iext'])
-    # sol = RN.run(time_sec=time_sec)
-    # sampling_rate = 50000
-    # t_low = int(sampling_rate * (time_sec-2))
-    # t_high = int(sampling_rate * time_sec) 
+def run_STN_GPe_system(yaml_path):
+    arguments = load_yaml(yaml_path)
+    arguments['time'] = int(120000)
+    save_yaml(arguments, os.path.join(project_root, 'temp', 'temp.yaml'))
+    results = STN_GPe_loop(os.path.join(project_root, 'temp', 'temp.yaml'))
+    spikes_data = np.array(results['spike_stn'])[20000:120000]
+    Analysis_PD= Analysis(spikes_data)
+    rate_data_PD = Analysis_PD.spike_rate(binsize = 100)
+    STN_4_PD = torch.tensor(np.array([rate_data_PD['1'], rate_data_PD['2'], rate_data_PD['3'], rate_data_PD['4']]))
+    STN_4_PD_processed = torch.mean(STN_4_PD.reshape(4,-1,100), dim = 2)
 
-    # x_vals = np.array(sol.y)[0:data['N'],t_low:t_high]
-    # osc_output = np.mean(x_vals[osc_no].reshape(-1,200,500),2)
-    # normalized_x_vals = (osc_output - np.min(osc_output))/(np.max(osc_output)-np.min(osc_output))
-    # x_std = np.std(normalized_x_vals,0)
-    # random_start = np.random.choice(np.arange(50))
-    # return normalized_x_vals[:,random_start:random_start+50] + 0.5, np.mean(x_std) #converting mean to be 1
-
+    return STN_4_PD_processed.T # shape (time, 4)
 
 def train(env, trails, epochs, bins, lr , 
           d1_amp = 1, d2_amp = 5, gpi_threshold = 3, max_gpi_iters = 250,
@@ -45,10 +37,6 @@ def train(env, trails, epochs, bins, lr ,
           ep_0 = 0.5,alpha_ep = 0.25,eta_ep = 0.1, ep_lim = None, 
           baseline_ep = 0.02, k_lim = None, track_arms = False):
     
-    # if STN_data is None:
-    #     print('Using Random noise')
-    # elif STN_data == 'rossler': 
-    #     print('Using Rossler system')
 
     num_arms = env.num_arms
     picks_per_bin = int(trails//bins)
@@ -60,6 +48,10 @@ def train(env, trails, epochs, bins, lr ,
     ip_monitor = {i: torch.zeros(epochs,trails,1) for i in np.arange(num_arms)}
     dp_monitor = {i: torch.zeros(epochs,trails,1) for i in np.arange(num_arms)}
     ep_monitor = torch.zeros(epochs, trails)
+
+    if STN_data is not None:
+        print(f'Running STN-GPe system')
+        stn_out_= run_STN_GPe_system(yaml_path = STN_data)
 
     for epoch in tqdm(range(epochs)):
         # print(f'**************************{epoch}*************************************')
@@ -83,17 +75,15 @@ def train(env, trails, epochs, bins, lr ,
         for trail in range(trails):
             ep_monitor[epoch, trail] = ep
             bin_num = int(trail//picks_per_bin)
-            random_osc_numbers = np.random.choice(np.arange(100), num_arms)
+            rand_num = np.random.choice(900)
             if STN_data is None:
                 stn_output = torch.randn((1,max_gpi_iters,num_arms), requires_grad= False) * ep + gpi_mean 
+                # print(stn_output.shape)
+            else:
+                stn_out = stn_out_[rand_num: rand_num + max_gpi_iters].unsqueeze(0)
+                stn_output = stn_out[:,:, 0: num_arms]
+                # print(stn_output.shape)
 
-            elif STN_data == 'rossler':
-                stn_output, _ = run_STN_GPe_system(ep = ep,osc_no = random_osc_numbers, k_lim = k_lim)
-                stn_output = torch.tensor(stn_output.T,dtype=torch.float32).unsqueeze(0)
-            elif STN_data == 'rossler_dbs':
-                # write code to directly read in data from pkl and simulate the system
-                pass
-               
             gpi_out, gpi_iters, dp_output, ip_output = bg_network(stn_output)
             arm_chosen = torch.argmax(gpi_out)
 

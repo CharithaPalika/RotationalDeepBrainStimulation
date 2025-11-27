@@ -26,11 +26,11 @@ DBS_func: 'biphasicDBS' # 'monophasicDBS', 'biphasicDBS' , 'biphasicDBS_uninoise
 # DBS_amplitude : 150
 DBS_freq : 130
 DBS_duty : 0.052 #26 #0.026
-DBS_A1 : -220 #-220 #250
-DBS_A2 : 220 #220 #-250
+DBS_A1 : -350 #-220 #250
+DBS_A2 : 350 #220 #-250
 pulseinterval : 10
 sector_wise : True
-t_sector_activation : 1250 #500 #250 #* 0.1 ms #100
+t_sector_activation : 500 #500 #250 #* 0.1 ms #100
 
 # DBS Spread
 center : 7

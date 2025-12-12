@@ -10,6 +10,12 @@ class Analysis:
     def __init__(self, spike_array):
         self.spike_array = np.array(spike_array)
 
+    def rescale(self, stn_abcd_processed):
+        global_mean = stn_abcd_processed.mean()
+        stn_abcd_processed = stn_abcd_processed + (1.0 - global_mean)
+        stn_abcd_rescaled = np.clip(stn_abcd_processed, a_min=0.5, a_max=1.5)
+        return stn_abcd_rescaled
+
     def spike_rate(self,binsize):
         ''' 
         Function to convert spike to rate of change
@@ -37,12 +43,21 @@ class Analysis:
         
         # computing STD
         stn_abcd = [mean_rate_a, mean_rate_b, mean_rate_c, mean_rate_d]
-        stn_abcd = np.array([(i-np.min(i[1000: time - 1000]))/(np.max(i) - np.min(i[1000: time - 1000])) for i in stn_abcd])*2
+        stn_abcd = np.array([(i-np.min(i[1000: time - 1000]))/(np.max(i) - np.min(i[1000: time - 1000])) for i in stn_abcd])* 4  #*2
         stn_abcd_processed = np.mean(stn_abcd.reshape(4,time_sec * 100, -1), axis = 2)
-        stn_proccessed_std = np.std(stn_abcd, axis = 0)
-        stn_mean_std = np.mean(stn_proccessed_std)
-        stn_max_std = np.max(stn_proccessed_std)
-        stn_min_std = np.min(stn_proccessed_std)
+        stn_abcd_rescaled = self.rescale(stn_abcd_processed)
+        stn_abcd_recaled_std = np.std(stn_abcd_rescaled, axis = 0)
+        stn_mean_std = np.mean(stn_abcd_recaled_std)
+        stn_max_std = np.max(stn_abcd_recaled_std)
+        stn_min_std = np.min(stn_abcd_recaled_std)
+    
+        
+        # stn_proccessed_std = np.std(stn_abcd, axis = 0)
+        # stn_mean_std = np.mean(stn_proccessed_std)
+        # stn_max_std = np.max(stn_proccessed_std)
+        # stn_min_std = np.min(stn_proccessed_std)
+        # Clipping and rescaling STN output
+
         rate_data = {'all_rate_data': rate_coded,
                      '1': mean_rate_a,
                      '2': mean_rate_b,
@@ -50,6 +65,7 @@ class Analysis:
                      '4': mean_rate_d,
                      'preprocessed_stn': stn_abcd,
                      'processed_stn': stn_abcd_processed,
+                     'rescaled_stn': stn_abcd_rescaled,
                      'mean_std': stn_mean_std,
                      'min_std': stn_min_std,
                      'max_std': stn_max_std}

@@ -17,22 +17,22 @@ def update_epsilon(ep_old,TD_error,alpha_ep, eta_ep, baseline_val = 0.02):
     ep = ep_old + alpha_ep * (1- torch.exp((-TD_error**2)/eta_ep) - ep_old) + baseline_val
     return ep.item()
 
-def run_STN_GPe_system(yaml_path):
-    arguments = load_yaml(yaml_path)
-    arguments['time'] = int(120000)
-    save_yaml(arguments, os.path.join(project_root, 'temp', 'temp.yaml'))
-    results = STN_GPe_loop(os.path.join(project_root, 'temp', 'temp.yaml'))
-    spikes_data = np.array(results['spike_stn'])[20000:120000]
-    Analysis_PD= Analysis(spikes_data)
-    rate_data_PD = Analysis_PD.spike_rate(binsize = 100)
-    STN_4_PD = torch.tensor(np.array([rate_data_PD['1'], rate_data_PD['2'], rate_data_PD['3'], rate_data_PD['4']]))
-    STN_4_PD_processed = torch.mean(STN_4_PD.reshape(4,-1,100), dim = 2)
-    ts = STN_4_PD_processed.T      # shape (time, 4)
-    print(torch.mean(torch.std(ts, dim = 1)))
-    mu = ts.mean(axis=0)           # mean of each column
-    ts_shifted = ts + (1 - mu)     # shift each column
-    print(torch.mean(ts_shifted), torch.mean(torch.std(ts_shifted, dim = 1)))
-    return ts_shifted #STN_4_PD_processed.T # shape (time, 4)
+# def run_STN_GPe_system(yaml_path):
+    # arguments = load_yaml(yaml_path)
+    # arguments['time'] = int(120000)
+    # save_yaml(arguments, os.path.join(project_root, 'temp', 'temp.yaml'))
+    # results = STN_GPe_loop(os.path.join(project_root, 'temp', 'temp.yaml'))
+    # spikes_data = np.array(results['spike_stn'])[20000:120000]
+    # Analysis_PD= Analysis(spikes_data)
+    # rate_data_PD = Analysis_PD.spike_rate(binsize = 100)
+    # STN_4_PD = torch.tensor(np.array([rate_data_PD['1'], rate_data_PD['2'], rate_data_PD['3'], rate_data_PD['4']]))
+    # STN_4_PD_processed = torch.mean(STN_4_PD.reshape(4,-1,100), dim = 2)
+    # ts = STN_4_PD_processed.T      # shape (time, 4)
+    # print(torch.mean(torch.std(ts, dim = 1)))
+    # mu = ts.mean(axis=0)           # mean of each column
+    # ts_shifted = ts + (1 - mu)     # shift each column
+    # print(torch.mean(ts_shifted), torch.mean(torch.std(ts_shifted, dim = 1)))
+    # return ts_shifted #STN_4_PD_processed.T # shape (time, 4)
 # 
 # def run_STN_GPe_system(yaml_path):
     # arguments = load_yaml(yaml_path)
@@ -49,6 +49,21 @@ def run_STN_GPe_system(yaml_path):
     # ts_shifted = ts + (1 - mu)     # shift each column
     # print(torch.mean(ts_shifted), torch.mean(torch.std(ts_shifted, dim = 1)))
     # return ts_shifted #STN_4_PD_processed.T # shape (time, 4)
+
+def run_STN_GPe_system(yaml_path):
+    arguments = load_yaml(yaml_path)
+    arguments['time'] = int(120000)
+    save_yaml(arguments, os.path.join(project_root, 'temp', 'temp.yaml'))
+    results = STN_GPe_loop(os.path.join(project_root, 'temp', 'temp.yaml'))
+    spikes_data = np.array(results['spike_stn'])[20000:120000]
+    Analysis_= Analysis(spikes_data)
+    rate_data = Analysis_.spike_rate(binsize = 100)
+    STN_4 = rate_data['rescaled_raw_data'] # shape (4, time)
+    print(f'StdDev of STN: {np.mean(np.std(STN_4, ax = 0))}, Mean of STN: {np.mean(np.mean(STN_4, ax = 0))}')
+    STN_4 = torch.tensor(STN_4).T # shape (time, 4)
+    
+    return STN_4    
+
 
 def train(env, trails, epochs, bins, lr , 
           d1_amp = 1, d2_amp = 5, gpi_threshold = 3, max_gpi_iters = 250,

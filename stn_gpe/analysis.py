@@ -10,13 +10,38 @@ class Analysis:
     def __init__(self, spike_array):
         self.spike_array = np.array(spike_array)
 
-    def rescale(self, stn_abcd_processed):
-        global_mean = stn_abcd_processed.mean()
-        stn_abcd_processed = stn_abcd_processed + (1.0 - global_mean)
-        stn_abcd_rescaled = np.clip(stn_abcd_processed, a_min=0.5, a_max=1.5)
-        return stn_abcd_rescaled
 
-    def spike_rate(self,binsize):
+
+    def rescale(self, rate_abcd_processed, clip_max = None, clip_min = None, target_mean = 1, max_std = 0.335):
+        rate_mean = rate_abcd_processed.mean(axis = 0, keepdims = True)
+        rate_std = rate_abcd_processed.std(axis = 0, keepdims = True)
+        scale = np.minimum(1.0, max_std / (rate_std + 1e-12))
+        rate_rescaled = (rate_abcd_processed - rate_mean) * scale + rate_mean
+        rate_rescaled_shifted = rate_rescaled + (target_mean - rate_rescaled.mean(axis = 0, keepdims = True))
+
+        if clip_max is not None or clip_min is not None:
+            rate_rescaled_shifted = np.clip(rate_rescaled_shifted, a_min=clip_min, a_max=clip_max)
+        return rate_rescaled_shifted
+        
+
+    # def rescale(self, stn_abcd_processed, clip_max = 1.75, clip_min = 0.5, target_mean = 1, max_std = 0.35):
+
+
+        # global_mean = stn_abcd_processed.mean()
+        # 
+        # stn_abcd_rescaled = stn_abcd_processed + (target_mean - global_mean)
+
+        # stn_abcd_rescaled = np.clip(stn_abcd_rescaled, a_min=clip_min, a_max=clip_max)
+        # clipped_std = stn_abcd_rescaled.std()
+        # if clipped_std > max_std:
+            # print(f'exceeding max std, {clipped_std}')
+            # stn_abcd_rescaled = stn_abcd_rescaled * (max_std / (clipped_std + 1e-12))
+
+        # stn_abcd_processed = stn_abcd_processed + (1.0 - global_mean)
+        # stn_abcd_rescaled = np.clip(stn_abcd_processed, a_min=clip_min, a_max=clip_max)
+        # return stn_abcd_rescaled
+
+    def spike_rate(self,binsize, scaling_factor = 8):
         ''' 
         Function to convert spike to rate of change
 
@@ -43,7 +68,7 @@ class Analysis:
         
         # computing STD
         rate_abcd = [mean_rate_a, mean_rate_b, mean_rate_c, mean_rate_d]
-        rate_abcd = np.array([(i-np.min(i[1000: time - 1000]))/(np.max(i) - np.min(i[1000: time - 1000])) for i in rate_abcd])* 4  #*2
+        rate_abcd = np.array([(i-np.min(i[1000: time - 1000]))/(np.max(i) - np.min(i[1000: time - 1000])) for i in rate_abcd])* scaling_factor #*2
         rate_abcd_processed = np.mean(rate_abcd.reshape(4,time_sec * 100, -1), axis = 2)
         rate_abcd_rescaled = self.rescale(rate_abcd_processed)
         rate_abcd_recaled_std = np.std(rate_abcd_rescaled, axis = 0)

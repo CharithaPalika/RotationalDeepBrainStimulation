@@ -2,7 +2,7 @@
 stn_gpe_units : 16
 
 # Number of iterations and time step
-time : 50000
+time : 50000 #120000 #50000
 dt : 0.1
 
 # Weights params

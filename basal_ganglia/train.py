@@ -52,14 +52,14 @@ def update_epsilon(ep_old,TD_error,alpha_ep, eta_ep, baseline_val = 0.02):
 
 def run_STN_GPe_system(yaml_path):
     arguments = load_yaml(yaml_path)
-    arguments['time'] = int(120000)
+    arguments['time'] = int(50000)
     save_yaml(arguments, os.path.join(project_root, 'temp', 'temp.yaml'))
     results = STN_GPe_loop(os.path.join(project_root, 'temp', 'temp.yaml'))
-    spikes_data = np.array(results['spike_stn'])[20000:120000]
+    spikes_data = np.array(results['spike_stn'])[20000:50000]
     Analysis_= Analysis(spikes_data)
     rate_data = Analysis_.spike_rate(binsize = 100)
-    STN_4 = rate_data['rescaled_raw_data'] # shape (4, time)
-    print(f'StdDev of STN: {np.mean(np.std(STN_4, ax = 0))}, Mean of STN: {np.mean(np.mean(STN_4, ax = 0))}')
+    STN_4 = rate_data['rescaled_rate_data'] # shape (4, time)
+    print(f'StdDev of STN: {np.mean(np.std(STN_4, axis = 0))}, Mean of STN: {np.mean(np.mean(STN_4, axis = 0))}')
     STN_4 = torch.tensor(STN_4).T # shape (time, 4)
     
     return STN_4    
@@ -110,7 +110,7 @@ def train(env, trails, epochs, bins, lr ,
         for trail in range(trails):
             ep_monitor[epoch, trail] = ep
             bin_num = int(trail//picks_per_bin)
-            rand_num = np.random.choice(900)
+            rand_num = np.random.choice(230) #np.random.choice(900)
             if STN_data is None:
                 stn_output = torch.randn((1,max_gpi_iters,num_arms), requires_grad= False) * ep + gpi_mean 
                 # print(stn_output.shape)

@@ -61,8 +61,8 @@ def run_STN_GPe_system(yaml_path):
     STN_4 = rate_data['rescaled_rate_data'] # shape (4, time)
     print(f'StdDev of STN: {np.mean(np.std(STN_4, axis = 0))}, Mean of STN: {np.mean(np.mean(STN_4, axis = 0))}')
     STN_4 = torch.tensor(STN_4).T # shape (time, 4)
-    
-    return STN_4    
+    STN_4_ = torch.randn((10000,4), requires_grad= False) * torch.mean(torch.std(STN_4,0)) + torch.mean(torch.mean(STN_4, 0)) 
+    return STN_4_    
 
 
 def train(env, trails, epochs, bins, lr , 
@@ -110,13 +110,13 @@ def train(env, trails, epochs, bins, lr ,
         for trail in range(trails):
             ep_monitor[epoch, trail] = ep
             bin_num = int(trail//picks_per_bin)
-            rand_num = np.random.choice(230) #np.random.choice(900)
+            rand_num = np.random.choice(9500) #np.random.choice(900)
             if STN_data is None:
                 stn_output = torch.randn((1,max_gpi_iters,num_arms), requires_grad= False) * ep + gpi_mean 
                 # print(stn_output.shape)
             else:
                 stn_out = stn_out_[rand_num: rand_num + max_gpi_iters].unsqueeze(0)
-                stn_output = stn_out[:,:, 0: num_arms]
+                stn_output = stn_out[:,:, 0:num_arms]
                 # print(stn_output.shape)
 
             gpi_out, gpi_iters, dp_output, ip_output = bg_network(stn_output)
@@ -169,7 +169,7 @@ def train(env, trails, epochs, bins, lr ,
                 ep = torch.clamp(torch.tensor(ep), max = ep_lim).item()
 
             if printing:
-                print(f'{trail}: dp: {dp_output}, arm_chosen:{arm_chosen}, TD error: {TD_error}, epsilon: {ep}')#dp_output, ip_output, gpi_out, gpi_iters,  arm_chosen, reward, TD_error)
+                print(f'{trail}: dp: {dp_output}, ip: {ip_output}, gpi: {gpi_out}, arm_chosen:{arm_chosen}')#, TD error: {TD_error}, epsilon: {ep}')#dp_output, ip_output, gpi_out, gpi_iters,  arm_chosen, reward, TD_error)
     
         if track_arms:
             arm_tracker_full.append(arm_tracker)

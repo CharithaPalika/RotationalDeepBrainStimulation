@@ -57,11 +57,15 @@ class BGNetwork(nn.Module):
                             # nn.init.uniform_(sublayer.bias, a=0.0, b= 0.001) #0.01)
                             torch.nn.init.constant_(sublayer.bias, 0.001)
 
-    def forward(self,stn_input):
+    def forward(self,stn_input, input = None):
         '''
         Args:
         stn_input(torch.tensor): shape (1, time_points, num_neurons = 4)
         '''
+        if input is not None:
+            self.input = input
+
+
         time_points = self.max_gpi_iters 
         assert time_points >= self.max_gpi_iters, "Number of timepoints is smaller than max iters"
 

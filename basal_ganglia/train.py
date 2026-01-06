@@ -17,39 +17,6 @@ def update_epsilon(ep_old,TD_error,alpha_ep, eta_ep, baseline_val = 0.02):
     ep = ep_old + alpha_ep * (1- torch.exp((-TD_error**2)/eta_ep) - ep_old) + baseline_val
     return ep.item()
 
-# def run_STN_GPe_system(yaml_path):
-    # arguments = load_yaml(yaml_path)
-    # arguments['time'] = int(120000)
-    # save_yaml(arguments, os.path.join(project_root, 'temp', 'temp.yaml'))
-    # results = STN_GPe_loop(os.path.join(project_root, 'temp', 'temp.yaml'))
-    # spikes_data = np.array(results['spike_stn'])[20000:120000]
-    # Analysis_PD= Analysis(spikes_data)
-    # rate_data_PD = Analysis_PD.spike_rate(binsize = 100)
-    # STN_4_PD = torch.tensor(np.array([rate_data_PD['1'], rate_data_PD['2'], rate_data_PD['3'], rate_data_PD['4']]))
-    # STN_4_PD_processed = torch.mean(STN_4_PD.reshape(4,-1,100), dim = 2)
-    # ts = STN_4_PD_processed.T      # shape (time, 4)
-    # print(torch.mean(torch.std(ts, dim = 1)))
-    # mu = ts.mean(axis=0)           # mean of each column
-    # ts_shifted = ts + (1 - mu)     # shift each column
-    # print(torch.mean(ts_shifted), torch.mean(torch.std(ts_shifted, dim = 1)))
-    # return ts_shifted #STN_4_PD_processed.T # shape (time, 4)
-# 
-# def run_STN_GPe_system(yaml_path):
-    # arguments = load_yaml(yaml_path)
-    # arguments['time'] = int(120000) #int(120000)
-    # save_yaml(arguments, 'temp.yaml')
-    # results = STN_GPe_loop('temp.yaml')
-    # spikes_data = np.array(results['spike_stn'])[20000:50000]
-    # Analysis_= Analysis(spikes_data)
-    # rate_data = Analysis_.spike_rate(binsize = 100)
-    # STN_4_processed = rate_data['processed_stn']
-    # ts = torch.tensor(STN_4_processed).T      # shape (time, 
-    # print(torch.mean(torch.std(ts, dim = 1)))
-    # mu = ts.mean(axis=0)           # mean of each column
-    # ts_shifted = ts + (1 - mu)     # shift each column
-    # print(torch.mean(ts_shifted), torch.mean(torch.std(ts_shifted, dim = 1)))
-    # return ts_shifted #STN_4_PD_processed.T # shape (time, 4)
-
 def run_STN_GPe_system(yaml_path):
     arguments = load_yaml(yaml_path)
     arguments['time'] = int(50000)
@@ -113,12 +80,11 @@ def train(env, trails, epochs, bins, lr ,
             rand_num = np.random.choice(9500) #np.random.choice(900)
             if STN_data is None:
                 stn_output = torch.randn((1,max_gpi_iters,num_arms), requires_grad= False) * ep + gpi_mean 
-                # print(stn_output.shape)
+                
             else:
                 stn_out = stn_out_[rand_num: rand_num + max_gpi_iters].unsqueeze(0)
                 stn_output = stn_out[:,:, 0:num_arms]
-                # print(stn_output.shape)
-
+                
             gpi_out, gpi_iters, dp_output, ip_output = bg_network(stn_output)
             arm_chosen = torch.argmax(gpi_out)
 

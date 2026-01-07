@@ -12,6 +12,9 @@
 !/results/stn_gpe_system/data/PD/processed_data.pkl
 !/results/stn_gpe_system/data/sector_DBS/processed_data_PI_10.pkl
 !/results/stn_gpe_system/data/sector_DBS/processed_data_PI_20.pkl
+!/results/stn_gpe_system/data/sector_DBS/processed_data_PI_10_vlow_freq.pkl
+!/results/stn_gpe_system/data/sector_DBS/processed_data_PI_20_vlow_freq.pkl
+!/results/stn_gpe_system/data/sector_DBS/processed_data_PI_20_vlow_freq_high_amp.pkl
 !/results/stn_gpe_system/data/std_DBS/processed_data.pkl
 
 

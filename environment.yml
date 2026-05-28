@@ -1,0 +1,16 @@
+name: light_house_dbs
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pip
+  - pip:
+      - pickle-mixin

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biphasic Pulse Waveform</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .figure-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    padding: 30px 20px;
+  }
+</style>
+</head>
+<body>
+<div class="figure-container">
+
+<!-- ═══════════════════════════════════════
+     WAVEFORM SVG
+     Zero line: y=230
+     A at y=110,  −A at y=350
+     Phase width τ = 38px
+     Inter-phase gap Δ = 32px   (visually prominent)
+     Period T = 200px
+     3 periods: x = 90, 290, 490
+     Phase1 (anodic,red):   x_s .. x_s+38
+     gap:                   x_s+38 .. x_s+70
+     Phase2 (cathodic,blue): x_s+70 .. x_s+108
+     rest zero:             x_s+108 .. x_s+200
+═══════════════════════════════════════ -->
+<svg viewBox="0 0 710 480" width="710" height="480"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <!-- AXES -->
+  <line x1="78" y1="42" x2="78" y2="410" stroke="#111" stroke-width="2"/>
+  <polygon points="73,44 78,32 83,44" fill="#111"/>
+  <line x1="78" y1="230" x2="615" y2="230" stroke="#111" stroke-width="2"/>
+  <polygon points="635,225 645,230 635,235" fill="#111"/>
+
+  <!-- Axis labels -->
+  <text x="50" y="38" font-size="22" font-style="italic" fill="#111" text-anchor="middle">I</text>
+  <text x="650" y="236" font-size="22" font-style="italic" fill="#111">t</text>
+  <text x="66"  y="236" font-size="16" fill="#444" text-anchor="middle">0</text>
+
+  <!-- ±A ticks and labels -->
+  <line x1="74" y1="110" x2="82" y2="110" stroke="#111" stroke-width="1.5"/>
+  <line x1="74" y1="350" x2="82" y2="350" stroke="#111" stroke-width="1.5"/>
+  <text x="60" y="115" font-size="18" font-style="italic" fill="#c02000" text-anchor="middle" font-weight="bold">A</text>
+  <text x="55" y="355" font-size="18" font-style="italic" fill="#1040b0" text-anchor="middle" font-weight="bold">−A</text>
+
+  <!-- Dashed ±A guide lines -->
+  <line x1="78" y1="110" x2="590" y2="110" stroke="#c02000" stroke-width="0.7" stroke-dasharray="5,5" />
+  <line x1="78" y1="350" x2="590" y2="350" stroke="#1040b0" stroke-width="0.7" stroke-dasharray="5,5" />
+<!-- opacity="0.28" -->
+  
+  <!-- Leading zero -->
+  <line x1="78" y1="230" x2="90" y2="230" stroke="#111" stroke-width="2.2"/>
+
+  <!-- ── PERIOD 1  x_s=90 ── -->
+  <rect x="90"  y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+  <!-- <rect x="128" y="230" width="32" height="120" fill="#c02000" opacity="0.05"/>gap filler transparent -->
+  <rect x="160" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+  <polyline points="90,230 90,110 128,110 128,230 160,230 160,350 198,350 198,230"
+            stroke="#111" stroke-width="2.2" fill="none"/>
+  <line x1="198" y1="230" x2="290" y2="230" stroke="#111" stroke-width="2.2"/>
+
+  <!-- ── PERIOD 2  x_s=290 ── -->
+  <rect x="290" y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+  <rect x="360" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+  <polyline points="290,230 290,110 328,110 328,230 360,230 360,350 398,350 398,230"
+            stroke="#111" stroke-width="2.2" fill="none"/>
+  <line x1="398" y1="230" x2="490" y2="230" stroke="#111" stroke-width="2.2"/>
+
+  <!-- ── PERIOD 3  x_s=490 ── -->
+  <rect x="490" y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+  <rect x="560" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+  <polyline points="490,230 490,110 528,110 528,230 560,230 560,350 598,350 598,230"
+            stroke="#111" stroke-width="2.2" fill="none"/>
+  <line x1="598" y1="230" x2="640" y2="230" stroke="#111" stroke-width="2.2"/>
+
+  <!-- ═══════════════════════════════════════
+       τ ANNOTATION  (period 1, phase 1: x=90..128)
+       Dotted verticals drop from x-axis downward
+  ═══════════════════════════════════════ -->
+  <line x1="90"  y1="230" x2="90"  y2="430" stroke="#555" stroke-width="1.1" stroke-dasharray="5,3"/>
+  <line x1="128" y1="230" x2="128" y2="430" stroke="#555" stroke-width="1.1" stroke-dasharray="5,3"/>
+  <!-- τ arrow -->
+  <line x1="90" y1="415" x2="128" y2="415" stroke="#444" stroke-width="1.5"/>
+  <polygon points="98,411 87,415 98,419" fill="#444"/>
+  <polygon points="120,411 130,415 120,419" fill="#444"/>
+  <text x="109" y="445" text-anchor="middle" font-size="20" font-style="italic" fill="#333">τ</text>
+
+  <!-- ═══════════════════════════════════════
+       Δ ANNOTATION  (gap: x=128..160)
+       Dotted vertical for x=160 (x=128 already drawn)
+  ═══════════════════════════════════════ -->
+  <line x1="160" y1="230" x2="160" y2="430" stroke="#888" stroke-width="1.1" stroke-dasharray="5,3"/>
+  <!-- Δ arrow (slightly higher than τ arrow to separate) -->
+  <line x1="128" y1="398" x2="160" y2="398" stroke="#666" stroke-width="1.4"/>
+  <polygon points="138,394 126,398 138,402" fill="#666"/>
+  <polygon points="151,394 163,398 151,402" fill="#666"/>
+  <text x="144" y="388" text-anchor="middle" font-size="18" font-style="italic" fill="#555">Δ</text>
+
+  <!-- ═══════════════════════════════════════
+       T ANNOTATION  (x=90..290, above)
+  ═══════════════════════════════════════ -->
+  <line x1="90"  y1="72" x2="290" y2="72" stroke="#222" stroke-width="1.5"/>
+  <polygon points="100,68 90,72 100,76" fill="#222"/>
+  <polygon points="280,68 290,72 280,76" fill="#222"/>
+  <line x1="90"  y1="72" x2="90"  y2="110" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="290" y1="72" x2="290" y2="110" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="190" y="63" text-anchor="middle" font-size="21" font-style="italic" fill="#111" font-weight="bold">T</text>
+
+</svg>
+
+<!-- ═══════════════════════════════════════
+     PARAMETER LEGEND — one row per param
+═══════════════════════════════════════ -->
+<svg viewBox="0 0 260 480" width="260" height="480"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <!-- Panel -->
+  <rect x="8" y="30" width="244" height="420" rx="10"
+        fill="#f5f5f2" stroke="#bbb" stroke-width="1"/>
+
+  <!-- Heading -->
+  <text x="130" y="60" text-anchor="middle" font-size="15"
+        fill="#222" font-weight="bold" letter-spacing="1.5">PARAMETERS</text>
+  <line x1="22" y1="70" x2="238" y2="70" stroke="#bbb" stroke-width="0.9"/>
+
+  <!--
+    Row layout:
+      symbol | name        | definition/unit
+      Rows spaced 54px apart starting at y=100
+  -->
+
+  <!-- Row 1: A -->
+  <text x="32"  y="103" font-size="20" font-style="italic" fill="#c02000" font-weight="bold">A</text>
+  <text x="58"  y="103" font-size="15" fill="#222">Amplitude</text>
+  <text x="58"  y="121" font-size="13" fill="#666">Peak current  [mA / μA]</text>
+  <line x1="22" y1="132" x2="238" y2="132" stroke="#ddd" stroke-width="0.7"/>
+
+  <!-- Row 2: τ -->
+  <text x="32"  y="154" font-size="20" font-style="italic" fill="#333">τ</text>
+  <text x="58"  y="154" font-size="15" fill="#222">Pulse width</text>
+  <text x="58"  y="172" font-size="13" fill="#666">Duration per phase  [μs]</text>
+  <line x1="22" y1="183" x2="238" y2="183" stroke="#ddd" stroke-width="0.7"/>
+
+  <!-- Row 3: Δ -->
+  <text x="32"  y="205" font-size="20" font-style="italic" fill="#555">Δ</text>
+  <text x="58"  y="205" font-size="15" fill="#222">Inter-phase gap</text>
+  <text x="58"  y="223" font-size="13" fill="#666">Delay between phases  [μs]</text>
+  <line x1="22" y1="234" x2="238" y2="234" stroke="#ddd" stroke-width="0.7"/>
+
+  <!-- Row 4: T -->
+  <text x="32"  y="256" font-size="20" font-style="italic" fill="#111" font-weight="bold">T</text>
+  <text x="58"  y="256" font-size="15" fill="#222">Period</text>
+  <text x="58"  y="274" font-size="13" fill="#666">Time per pulse cycle  [ms]</text>
+  <line x1="22" y1="285" x2="238" y2="285" stroke="#ddd" stroke-width="0.7"/>
+
+  <!-- Row 5: f -->
+  <text x="32"  y="307" font-size="20" font-style="italic" fill="#333">f</text>
+  <text x="58"  y="307" font-size="15" fill="#222">Frequency</text>
+  <text x="58"  y="325" font-size="13" fill="#666" font-style="italic">f = 1 / T    [Hz]</text>
+  <line x1="22" y1="336" x2="238" y2="336" stroke="#ddd" stroke-width="0.7"/>
+
+  <!-- Row 6: D -->
+  <text x="32"  y="358" font-size="20" font-style="italic" fill="#333" font-weight="bold">D</text>
+  <text x="58"  y="358" font-size="15" fill="#222">Duty cycle</text>
+  <text x="58"  y="376" font-size="13" fill="#666" font-style="italic">D = τ / T    [0 – 1]</text>
+  <line x1="22" y1="387" x2="238" y2="387" stroke="#ddd" stroke-width="0.7"/>
+
+  <!-- Note -->
+  <text x="130" y="408" text-anchor="middle" font-size="12" fill="#888">Charge balance:  A · τ = const.</text>
+  <text x="130" y="424" text-anchor="middle" font-size="12" fill="#888">equal charge per phase  |q₁| = |q₂|</text>
+
+</svg>
+
+</div>
+</body>
+</html>

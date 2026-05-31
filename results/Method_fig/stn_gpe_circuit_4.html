@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; padding: 40px; }
+</style>
+</head>
+<body>
+
+<svg id="svg" viewBox="0 0 1100 730" width="1100" height="730"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="ah-exc" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#1a6e1a"/>
+    </marker>
+    <marker id="ah-inh" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#b52a1a"/>
+    </marker>
+    <marker id="ah-lat-stn" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="#1a6e1a"/>
+    </marker>
+    <marker id="ah-lat-gpe" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="#b52a1a"/>
+    </marker>
+    <marker id="ah-d2" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#2255aa"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="730" fill="#ffffff"/>
+
+  <!-- ══════════════════════════════
+       I_strD2 INPUT ABOVE GPe
+       Arrow from y=8 down to top of GPe panel (y=118)
+       ══════════════════════════════ -->
+  <!-- Label above arrow -->
+  <text x="845" y="22" text-anchor="middle" font-size="22" font-weight="bold" fill="#2255aa">I</text>
+  <text x="863" y="28" text-anchor="start"  font-size="14" font-style="italic" fill="#2255aa">strD2</text>
+  <!-- Arrow down into GPe top -->
+  <line x1="845" y1="32" x2="845" y2="115"
+        stroke="#2255aa" stroke-width="2.8" marker-end="url(#ah-d2)"/>
+
+  <!-- ══════════════════════════════
+       PANELS  (y shifted down 60px vs prior to give room for input arrow)
+       ══════════════════════════════ -->
+  <rect x="40"  y="118" width="430" height="460" rx="12"
+        fill="#f0fff0" stroke="#1a6e1a" stroke-width="2.8"/>
+  <text x="255" y="105" text-anchor="middle" font-size="32" font-weight="bold" fill="#1a6e1a">STN</text>
+  <text x="255" y="598" text-anchor="middle" font-size="17" font-style="italic" fill="#1a6e1a">(Glutamatergic)</text>
+
+  <rect x="630" y="118" width="430" height="460" rx="12"
+        fill="#fff0ee" stroke="#b52a1a" stroke-width="2.8"/>
+  <text x="845" y="105" text-anchor="middle" font-size="32" font-weight="bold" fill="#b52a1a">GPe</text>
+  <text x="845" y="598" text-anchor="middle" font-size="17" font-style="italic" fill="#b52a1a">(GABAergic)</text>
+
+  <!-- layers rendered by JS in correct order -->
+  <g id="stn-lat-lines"></g>
+  <g id="gpe-lat-lines"></g>
+  <g id="stn-neurons"></g>
+  <g id="gpe-neurons"></g>
+
+  <!-- ══════════════════════════════
+       BIDIRECTIONAL ARROWS IN GAP
+       STN→GPe AMPA/NMDA at y=288
+       GPe→STN GABA_A    at y=398
+       ══════════════════════════════ -->
+  <line x1="474" y1="288" x2="626" y2="288"
+        stroke="#1a6e1a" stroke-width="2.8" marker-end="url(#ah-exc)"/>
+  <rect x="499" y="272" width="102" height="23" rx="4"
+        fill="#ffffff" stroke="#1a6e1a" stroke-width="1.2"/>
+  <text x="550" y="288" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a6e1a">AMPA / NMDA</text>
+
+  <line x1="626" y1="398" x2="474" y2="398"
+        stroke="#b52a1a" stroke-width="2.8" marker-end="url(#ah-inh)"/>
+  <rect x="504" y="382" width="92" height="23" rx="4"
+        fill="#ffffff" stroke="#b52a1a" stroke-width="1.2"/>
+  <text x="550" y="398" text-anchor="middle" font-size="13" font-weight="bold" fill="#b52a1a">GABA&#8336;</text>
+
+  <!-- ══════════════════════════════
+       LEGEND
+       ══════════════════════════════ -->
+  <line x1="190" y1="672" x2="230" y2="672" stroke="#1a6e1a" stroke-width="2.5"/>
+  <polygon points="225,667 236,672 225,677" fill="#1a6e1a"/>
+  <text x="246" y="678" font-size="18" fill="#1a6e1a">Excitatory (AMPA/NMDA)</text>
+
+  <line x1="570" y1="672" x2="610" y2="672" stroke="#b52a1a" stroke-width="2.5"/>
+  <polygon points="605,667 616,672 605,677" fill="#b52a1a"/>
+  <text x="626" y="678" font-size="18" fill="#b52a1a">Inhibitory (GABA&#8336;)</text>
+
+  <line x1="190" y1="700" x2="230" y2="700" stroke="#1a6e1a" stroke-width="1.8" stroke-dasharray="5,3"/>
+  <polygon points="225,695 236,700 225,705" fill="#1a6e1a"/>
+  <text x="246" y="706" font-size="18" fill="#1a6e1a">STN Lateral</text>
+
+  <line x1="570" y1="700" x2="610" y2="700" stroke="#b52a1a" stroke-width="1.8" stroke-dasharray="5,3"/>
+  <polygon points="605,695 616,700 605,705" fill="#b52a1a"/>
+  <text x="626" y="706" font-size="18" fill="#b52a1a">GPe Lateral</text>
+
+</svg>
+
+<script>
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+const N = 6;
+const R = 18;
+const JITTER = 8;
+const CONNECT_PCT = 0.14;
+
+// Panel inner bounds (panels now start at y=118)
+const stnX0 = 72,  stnX1 = 438, stnY0 = 146, stnY1 = 546;
+const gpeX0 = 662, gpeX1 = 1028, gpeY0 = 146, gpeY1 = 546;
+
+const stnSX = (stnX1 - stnX0) / (N - 1);
+const stnSY = (stnY1 - stnY0) / (N - 1);
+const gpeSX = (gpeX1 - gpeX0) / (N - 1);
+const gpeSY = (gpeY1 - gpeY0) / (N - 1);
+
+const svgNS = 'http://www.w3.org/2000/svg';
+
+function makePt(parent, tag, attrs) {
+  const el = document.createElementNS(svgNS, tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  parent.appendChild(el);
+  return el;
+}
+
+function buildPositions(x0, y0, sx, sy, seed) {
+  const rng = mulberry32(seed);
+  const pos = [];
+  for (let row = 0; row < N; row++) {
+    for (let col = 0; col < N; col++) {
+      const bx = x0 + col * sx;
+      const by = y0 + row * sy;
+      const jx = (rng() - 0.5) * 2 * JITTER;
+      const jy = (rng() - 0.5) * 2 * JITTER;
+      pos.push({ x: bx + jx, y: by + jy, row, col, idx: row * N + col });
+    }
+  }
+  return pos;
+}
+
+const stnPos = buildPositions(stnX0, stnY0, stnSX, stnSY, 42);
+const gpePos = buildPositions(gpeX0, gpeY0, gpeSX, gpeSY, 77);
+
+function drawLaterals(pos, layerEl, chosenIdxs, color, markerUrl) {
+  const total = pos.length;
+  const connectCount = Math.round((total - 1) * CONNECT_PCT);
+  const rng = mulberry32(chosenIdxs[0] * 1000 + 7);
+
+  for (const srcIdx of chosenIdxs) {
+    const src = pos[srcIdx];
+    const others = pos.filter(p => p.idx !== srcIdx);
+    const withDist = others.map(p => ({
+      p, d: Math.hypot(p.x - src.x, p.y - src.y)
+    }));
+    withDist.sort((a,b) => a.d - b.d);
+    const half = Math.floor(withDist.length / 2);
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    const nearCount = Math.round(connectCount * 0.6);
+    const farCount  = connectCount - nearCount;
+    const chosen = [
+      ...shuffle(withDist.slice(0, half)).slice(0, nearCount),
+      ...shuffle(withDist.slice(half)).slice(0, farCount)
+    ];
+
+    for (const {p: tgt} of chosen) {
+      const mx = (src.x + tgt.x) / 2;
+      const my = (src.y + tgt.y) / 2;
+      const dx = tgt.x - src.x, dy = tgt.y - src.y;
+      const perp = 0.22;
+      const cpx = mx - dy * perp;
+      const cpy = my + dx * perp;
+      const a1 = Math.atan2(cpy - src.y, cpx - src.x);
+      const a2 = Math.atan2(cpy - tgt.y, cpx - tgt.x);
+      makePt(layerEl, 'path', {
+        d: `M ${src.x + Math.cos(a1)*R},${src.y + Math.sin(a1)*R} Q ${cpx},${cpy} ${tgt.x + Math.cos(a2)*R},${tgt.y + Math.sin(a2)*R}`,
+        stroke: color, 'stroke-width': '1.4', fill: 'none',
+        'stroke-dasharray': '5,3', 'marker-end': markerUrl, opacity: '0.75'
+      });
+    }
+
+    // Dashed ring around chosen neuron
+    makePt(layerEl, 'circle', {
+      cx: src.x, cy: src.y, r: R + 5,
+      fill: 'none', stroke: color,
+      'stroke-width': '2', 'stroke-dasharray': '4,2'
+    });
+  }
+}
+
+// Draw neurons — chosen ones are darker
+function drawNeurons(pos, layerEl, fillNormal, fillChosen, stroke, chosenSet) {
+  for (const p of pos) {
+    const isChosen = chosenSet.has(p.idx);
+    makePt(layerEl, 'circle', {
+      cx: p.x, cy: p.y, r: R,
+      fill: isChosen ? fillChosen : fillNormal,
+      stroke,
+      'stroke-width': isChosen ? '2.8' : '2'
+    });
+  }
+}
+
+const stnChosen = [2, 14, 31];
+const gpeChosen = [1, 20, 33];
+
+drawLaterals(stnPos, document.getElementById('stn-lat-lines'), stnChosen, '#1a6e1a', 'url(#ah-lat-stn)');
+drawLaterals(gpePos, document.getElementById('gpe-lat-lines'), gpeChosen, '#b52a1a', 'url(#ah-lat-gpe)');
+
+// Normal fill, Darker fill (same hue, more saturated), stroke
+drawNeurons(stnPos, document.getElementById('stn-neurons'), '#c8f0c8', '#6abf6a', '#1a6e1a', new Set(stnChosen));
+drawNeurons(gpePos, document.getElementById('gpe-neurons'), '#f5c8c8', '#d96060', '#b52a1a', new Set(gpeChosen));
+</script>
+</body>
+</html>

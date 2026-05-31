@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combined Figure</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
+</style>
+</head>
+<body>
+
+<!--
+  ══════════════════════════════════════════════════════════════════
+  MASTER LAYOUT  (all coordinates in viewBox units, 2400 × 1520)
+  ──────────────────────────────────────────────────────────────────
+  Left panel  (a) BG:   x=0..1070,  y=0..1520
+              inner g:  translate(BG_TX=18, BG_TY=68) scale(BG_S=0.93)
+
+  Right column x=1090..2390 (width=1300), split:
+    Top row    (height ~520):
+      (b) Pulse + param legend   x=1090..1720  (w=630)
+      (c) sDBS grid              x=1730..2390  (w=660)
+    Bottom row (height ~990):
+      (d) rDBS                   x=1090..2390
+
+  Sub-panel label y positions (absolute):
+    (a) y=44
+    (b) y=44,  inner g at translate(PULSE_TX=1095, PULSE_TY=62) scale(PULSE_S=0.68)
+    (c) y=44,  inner g at translate(SDBS_TX=1745,  SDBS_TY=62)  scale(SDBS_S=1.15)
+    (d) y=590, inner g at translate(RDBS_TX=1095,  RDBS_TY=614) scale(RDBS_S=0.88)
+  ══════════════════════════════════════════════════════════════════
+-->
+
+<svg id="main-svg" viewBox="0 0 2400 1520" width="2400" height="1520"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="ah-blk" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#111"/>
+    </marker>
+    <marker id="ah-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#c0392b"/>
+    </marker>
+    <marker id="ah-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#1a7a1a"/>
+    </marker>
+    <marker id="ah-pur" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#7030a0"/>
+    </marker>
+    <marker id="ah-t" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#333"/>
+    </marker>
+    <linearGradient id="cbar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#cc2200"/>
+      <stop offset="50%"  stop-color="#f0a000"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2400" height="1520" fill="#ffffff"/>
+
+  <!-- Panel dividers -->
+  <line x1="1078" y1="10"  x2="1078" y2="1510" stroke="#ccc" stroke-width="1.2" stroke-dasharray="6,4"/>
+  <line x1="1090" y1="560" x2="2390" y2="560"  stroke="#ccc" stroke-width="1.2" stroke-dasharray="6,4"/>
+  <line x1="1730" y1="10"  x2="1730" y2="558"  stroke="#ccc" stroke-width="1.2" stroke-dasharray="6,4"/>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (a)  BASAL GANGLIA NETWORK
+       BG_TX=18  BG_TY=68  BG_S=0.93
+       The BG SVG coordinate space is ~1000×1090 at scale 1.0.
+       Connections corrected vs. original:
+         - SNc→D1(+δ): clean L-path, no overlap
+         - SNc→D2(−δ): single dashed path, proper routing
+         - Removed extraneous extra purple polylines
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="18" y="42" font-size="30" font-weight="bold" fill="#111">(a) Basal Ganglia Network</text>
+
+  <g transform="translate(18,68) scale(0.93)">
+
+    <!-- ── Decision Making Task Box ── -->
+    <rect x="1" y="260" width="280" height="348" rx="8"
+          fill="#f9f9f9" stroke="#444" stroke-width="2.2"/>
+    <text x="140" y="296" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Decision Making Task</text>
+    <!-- <text x="131" y="321" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Task</text> -->
+
+    <!-- Reward plot axes -->
+    <line x1="30" y1="425" x2="265" y2="425" stroke="#444" stroke-width="1.4"/>
+    <line x1="30" y1="345" x2="30"  y2="425" stroke="#444" stroke-width="1.4"/>
+    <text x="135" y="445" text-anchor="middle" font-size="20" fill="#222" font-style="italic">Reward</text>
+    <text x="15"  y="398" text-anchor="middle" font-size="20" fill="#222" font-style="italic"
+          transform="rotate(-90,11,385)">p(R)</text>
+
+    <!-- Arm C -->
+    <path d="M 30,425 C 30,425 44,425 60,404 C 72,387 74,380 80,378 C 86,380 88,387 100,404 C 116,425 130,425 130,425"
+          stroke="#888" stroke-width="1.8" fill="#88888818"/>
+    <line x1="80" y1="378" x2="80" y2="425" stroke="#888" stroke-width="1.1" stroke-dasharray="3,2"/>
+    <text x="80" y="360" text-anchor="middle" font-size="25" fill="#4477aa" font-style="italic">μ<tspan baseline-shift="sub" 
+      font-size="18">C</tspan></text>
+    <text x="80" y="410" text-anchor="middle" font-size="20" font-weight="bold" fill="#555">C</text>
+
+    <!-- Arm A -->
+    <path d="M 108,425 C 118,425 132,425 146,402 C 158,382 160,372 163,370 C 166,372 168,382 180,402 C 194,425 208,425 208,425"
+          stroke="#6699cc" stroke-width="1.8" fill="#6699cc18"/>
+    <line x1="163" y1="370" x2="163" y2="425" stroke="#6699cc" stroke-width="1.1" stroke-dasharray="3,2"/>
+     <text x="163" y="352" text-anchor="middle" font-size="25" fill="#4477aa" font-style="italic">μ<tspan baseline-shift="sub" 
+      font-size="18">A</tspan></text>
+    <text x="163" y="410" text-anchor="middle" font-size="20" font-weight="bold" fill="#4477aa">A</text>
+
+    <!-- Arm B (winner) -->
+    <path d="M 186,425 C 196,425 208,425 215,402 C 222,380 223,358 225,356 C 227,358 228,380 235,402 C 242,425 265,425 265,425"
+          stroke="#2255aa" stroke-width="2.2" fill="#2255aa44"/>
+    <line x1="225" y1="356" x2="225" y2="425" stroke="#2２55aa" stroke-width="1.3" stroke-dasharray="3,２"/>
+    <text x="225" y="338" text-anchor="middle" font-size="25" fill="#4477aa" font-style="italic">μ<tspan baseline-shift="sub" 
+      font-size="18">B</tspan></text>
+    <text x="225" y="410" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">B</text>
+
+    <!-- Cards -->
+    <rect x="28"  y="465" width="58" height="66" rx="5" fill="#fff"    stroke="#555" stroke-width="2"/>
+    <text x="57"  y="505" text-anchor="middle" font-size="24" font-weight="bold" fill="#333">A</text>
+    <rect x="101" y="465" width="58" height="66" rx="5" fill="#abcef5" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="130" y="505" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">B</text>
+    <rect x="174" y="465" width="58" height="66" rx="5" fill="#fff"    stroke="#555" stroke-width="2"/>
+    <text x="203" y="505" text-anchor="middle" font-size="24" font-weight="bold" fill="#333">C</text>
+
+    <!-- Reward formula -->
+    <text x="140" y="568" text-anchor="middle" font-size="25" fill="#111">
+      <tspan font-style="italic">R</tspan><tspan baseline-shift="sub" font-size="18">B</tspan>
+      <tspan> ~ 𝒩(μ</tspan><tspan baseline-shift="sub" font-size="18">B</tspan>
+      <tspan>, σ</tspan><tspan baseline-shift="sub" font-size="18">B</tspan>
+      <tspan baseline-shift="super" font-size="18">2</tspan><tspan>)</tspan>
+    </text>
+    <text x="131" y="595" text-anchor="middle" font-size="20" fill="#444">(reward drawn from B)</text>
+
+    <!-- SNc -->
+    <ellipse cx="360" cy="625" rx="62" ry="50" fill="#f3eafa" stroke="#7030a0" stroke-width="2.5"/>
+    <text x="360" y="616" text-anchor="middle" font-size="28" font-weight="bold" fill="#7030a0">SNc</text>
+    <text x="360" y="643" text-anchor="middle" font-size="21" font-style="italic" fill="#7030a0">δ = R − Q</text>
+
+    <!-- Input labels A/B/C -->
+    <text x="470" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">A</text>
+    <line x1="470" y1="27" x2="470" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+    <text x="560" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">B</text>
+    <line x1="560" y1="27" x2="560" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+    <text x="650" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">C</text>
+    <line x1="650" y1="27" x2="650" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+
+    <!-- Cortex -->
+    <rect x="390" y="98" width="310" height="72" rx="8" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="545" y="133" text-anchor="middle" font-size="29" font-weight="bold" fill="#2255aa">Cortex</text>
+    <circle cx="470" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="560" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="650" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- Cortex → D1/D2 (black excitatory) -->
+    <line x1="466" y1="160" x2="433" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="474" y1="160" x2="604" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="556" y1="160" x2="473" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="564" y1="160" x2="644" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="646" y1="160" x2="513" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="654" y1="160" x2="684" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+
+    <!-- D1 -->
+    <rect x="390" y="232" width="165" height="82" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="472" y="257" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">D₁</text>
+    <text x="430" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">A</text>
+    <text x="470" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">B</text>
+    <text x="510" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">C</text>
+    <circle cx="430" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="470" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="510" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- D2 -->
+    <rect x="565" y="232" width="165" height="82" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="647" y="257" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">D₂</text>
+    <text x="605" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">A</text>
+    <text x="645" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">B</text>
+    <text x="685" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">C</text>
+    <circle cx="605" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="645" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="685" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- GPe -->
+    <rect x="780" y="232" width="190" height="170" rx="7" fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="875" y="258" text-anchor="middle" font-size="26" font-weight="bold" fill="#c0392b">GPe</text>
+    <rect x="788" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="812" y="280" text-anchor="middle" font-size="15" fill="#c0392b" font-style="italic">c₀</text>
+    <circle cx="812" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="812" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="812" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="812" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <rect x="846" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="870" y="280" text-anchor="middle" font-size="15" fill="#c0392b" font-style="italic">c₁</text>
+    <circle cx="870" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="870" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="870" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="870" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <rect x="904" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="928" y="280" text-anchor="middle" font-size="15" fill="#c0392b" font-style="italic">c₂</text>
+    <circle cx="928" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="928" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="928" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="928" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+
+    <!-- STN -->
+    <rect x="780" y="458" width="200" height="170" rx="7" fill="#f0fff0" stroke="#1a7a1a" stroke-width="2.5"/>
+    <text x="880" y="483" text-anchor="middle" font-size="26" font-weight="bold" fill="#1a7a1a">STN</text>
+    <rect x="788" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="814" y="510" text-anchor="middle" font-size="15" fill="#1a7a1a" font-style="italic">c₀</text>
+    <circle cx="814" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="814" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="814" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="814" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <rect x="850" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="876" y="510" text-anchor="middle" font-size="15" fill="#1a7a1a" font-style="italic">c₁</text>
+    <circle cx="876" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="876" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="876" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="876" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <rect x="912" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="938" y="510" text-anchor="middle" font-size="15" fill="#1a7a1a" font-style="italic">c₂</text>
+    <circle cx="938" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="938" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="938" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="938" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+
+    <!-- GPi -->
+    <rect x="390" y="720" width="340" height="65" rx="7" fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="560" y="749" text-anchor="middle" font-size="26" font-weight="bold" fill="#c0392b">GPi</text>
+    <circle cx="430" cy="762" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+    <circle cx="470" cy="762" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+    <circle cx="510" cy="762" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+
+    <!-- Thalamus -->
+    <rect x="390" y="870" width="340" height="105" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="560" y="898" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">Thalamus</text>
+    <text x="430" y="918" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">A</text>
+    <text x="470" y="918" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">B</text>
+    <text x="510" y="918" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">C</text>
+    <text x="470" y="962" text-anchor="middle" font-size="15" font-style="italic" fill="#2255aa">Winning neuron</text>
+    <circle cx="430" cy="932" r="9"  fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+    <circle cx="470" cy="932" r="12" fill="#337ef5" stroke="#1a4487" stroke-width="2.5"/>
+    <circle cx="510" cy="932" r="9"  fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+
+    <!-- ══ CONNECTIONS ══ -->
+
+    <!-- R: task box right edge → SNc  (black dashed) -->
+    <polyline points="280,515 345,515 345,572"
+              stroke="#111" stroke-width="2.0" stroke-dasharray="8,5" fill="none" marker-end="url(#ah-blk)"/>
+    <text x="294" y="504" text-anchor="middle" font-size="22" font-weight="bold" font-style="italic" fill="#111">R</text>
+
+    <!-- Q-value dashed line: from D1 left side → SNc top
+         Route: from x=390,y=375 left to x=340,y=315 then down to SNc top -->
+    <polyline points="510,425,372,425 372,575"
+              stroke="#7030a0" stroke-width="2" stroke-dasharray="8,5" fill="none" marker-end="url(#ah-pur)"/>
+    <text x="366" y="418" text-anchor="middle" font-size="19" font-style="italic" fill="#7030a0" font-weight="bold">Q-value</text>
+
+    <!-- Purple junction dots on the Q-value line (at D1 neuron level) -->
+    <circle cx="430" cy="425" r="4.5" fill="#7030a0"/>
+    <circle cx="470" cy="425" r="4.5" fill="#7030a0"/>
+    <circle cx="510" cy="425" r="4.5" fill="#7030a0"/>
+    
+    <!-- D2 → GPe (inhibitory red) -->
+    <line x1="730" y1="274" x2="778" y2="274" stroke="#c0392b" stroke-width="2.0" marker-end="url(#ah-red)"/>
+
+    <!-- GPe ↔ STN (inhibitory red down, excitatory green up) -->
+    <line x1="852" y1="402" x2="852" y2="456" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="882" y1="456" x2="882" y2="402" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+    <!-- D1 → GPi (inhibitory red, 3 lines with Q labels) -->
+    <line x1="430" y1="302" x2="430" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="465" y="418" text-anchor="end"    font-size="15" font-style="italic" fill="#c0392b">Q(A)</text>
+    <line x1="470" y1="302" x2="470" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="490" y="418" text-anchor="middle" font-size="15" font-style="italic" fill="#c0392b">Q(B)</text>
+    <line x1="510" y1="302" x2="510" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="515" y="418" text-anchor="start"  font-size="15" font-style="italic" fill="#c0392b">Q(C)</text>
+
+    
+    <!-- STN → GPi (excitatory green, 3 diagonal lines) -->
+    <line x1="814" y1="616" x2="432" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+    <line x1="876" y1="616" x2="472" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+    <line x1="938" y1="616" x2="512" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+    <!-- GPi → Thalamus (inhibitory red) -->
+    <line x1="430" y1="785" x2="430" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="470" y1="785" x2="470" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="510" y1="785" x2="510" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+
+    <!-- Thalamus → Task box feedback (black dashed) -->
+    <polyline points="470,975 470,1010 131,1010 131,613"
+              stroke="#111" stroke-width="2.2" fill="none" marker-end="url(#ah-blk)" stroke-dasharray="10,4"/>
+    <text x="295" y="1030" text-anchor="middle" font-size="20" fill="#333" font-style="italic">chosen card: B</text>
+
+    <!-- Legend -->
+    <line x1="140" y1="1075" x2="204" y2="1075" stroke="#1a7a1a" stroke-width="3"/>
+    <polygon points="199,1069 210,1075 199,1081" fill="#1a7a1a"/>
+    <text x="220" y="1081" font-size="30" font-weight="bold" fill="#1a7a1a">Excitatory</text>
+    <line x1="420" y1="1075" x2="484" y2="1075" stroke="#c0392b" stroke-width="3"/>
+    <polygon points="479,1069 490,1075 479,1081" fill="#c0392b"/>
+    <text x="500" y="1081" font-size="30" font-weight="bold" fill="#c0392b">Inhibitory</text>
+    <line x1="690" y1="1075" x2="754" y2="1075" stroke="#7030a0" stroke-width="3" stroke-dasharray="8,4"/>
+    <polygon points="749,1069 760,1075 749,1081" fill="#7030a0"/>
+    <text x="770" y="1081" font-size="30" font-weight="bold" fill="#7030a0">Dopaminergic</text>
+
+  </g>
+  <!-- END (a) BG ════════════════════════════════════════════════ -->
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (b)  DBS BIPHASIC PULSE  +  PARAMETER LEGEND
+       Occupies right-top-LEFT: x=1090..1728, y=0..558
+
+       Waveform internal coordinates (original viewBox ~710×480):
+         - We use internal x from 55..650, y from 32..460
+         - Scale 0.68 → rendered width = 650×0.68 = 442px, height = 460×0.68 = 313px
+         - translate(1098, 58): waveform fits within x=1098..1540, y=58..371
+       Parameter legend block:
+         - Internal width 260, scale 0.86 → rendered 224px
+         - translate(1098+442+10=1550, 58)  → x=1550..1774  ← fits within 1728 if we shrink
+         - Actually translate(1098, 62) for waveform, translate(1500, 62) for params
+         - Params block: 260×420 @ scale 0.82 → 213×344px, placed at x=1506..1719
+       PULSE_TX=1098  PULSE_TY=62  PULSE_S=0.68
+       PARAM_TX=1506  PARAM_TY=62  PARAM_S=0.82
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="1095" y="42" font-size="30" font-weight="bold" fill="#111">(b) DBS Biphasic Pulse</text>
+
+  <!-- Waveform: internal coordinates kept as-is, scaled to 0.68 -->
+  <g transform="translate(1098,62) scale(0.68)">
+
+    <!-- AXES -->
+    <line x1="78" y1="42" x2="78" y2="415" stroke="#111" stroke-width="2.8"/>
+    <polygon points="73,44 78,32 83,44" fill="#111"/>
+    <line x1="78" y1="230" x2="620" y2="230" stroke="#111" stroke-width="2.8"/>
+    <polygon points="638,225 648,230 638,235" fill="#111"/>
+
+    <!-- Axis labels -->
+    <text x="52" y="38"  font-size="30" font-style="italic" fill="#111" text-anchor="middle" font-weight="bold">I</text>
+    <text x="656" y="237" font-size="30" font-style="italic" fill="#111" font-weight="bold">t</text>
+    <text x="66"  y="237" font-size="20" fill="#444" text-anchor="middle">0</text>
+
+    <!-- ±A ticks + labels -->
+    <line x1="70" y1="110" x2="86" y2="110" stroke="#111" stroke-width="2.2"/>
+    <line x1="70" y1="350" x2="86" y2="350" stroke="#111" stroke-width="2.2"/>
+    <text x="52" y="117" font-size="26" font-style="italic" fill="#c02000" text-anchor="middle" font-weight="bold">A</text>
+    <text x="44" y="358" font-size="26" font-style="italic" fill="#1040b0" text-anchor="middle" font-weight="bold">−A</text>
+
+    <!-- Dashed guide lines -->
+    <line x1="78" y1="110" x2="600" y2="110" stroke="#c02000" stroke-width="1.0" stroke-dasharray="6,5"/>
+    <line x1="78" y1="350" x2="600" y2="350" stroke="#1040b0" stroke-width="1.0" stroke-dasharray="6,5"/>
+
+    <!-- Leading zero segment -->
+    <line x1="78" y1="230" x2="90" y2="230" stroke="#111" stroke-width="2.8"/>
+
+    <!-- Period 1  xs=90 -->
+    <rect x="90"  y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+    <rect x="160" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+    <polyline points="90,230 90,110 128,110 128,230 160,230 160,350 198,350 198,230"
+              stroke="#111" stroke-width="2.8" fill="none"/>
+    <line x1="198" y1="230" x2="290" y2="230" stroke="#111" stroke-width="2.8"/>
+
+    <!-- Period 2  xs=290 -->
+    <rect x="290" y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+    <rect x="360" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+    <polyline points="290,230 290,110 328,110 328,230 360,230 360,350 398,350 398,230"
+              stroke="#111" stroke-width="2.8" fill="none"/>
+    <line x1="398" y1="230" x2="490" y2="230" stroke="#111" stroke-width="2.8"/>
+
+    <!-- Period 3  xs=490 -->
+    <rect x="490" y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+    <rect x="560" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+    <polyline points="490,230 490,110 528,110 528,230 560,230 560,350 598,350 598,230"
+              stroke="#111" stroke-width="2.8" fill="none"/>
+    <line x1="598" y1="230" x2="648" y2="230" stroke="#111" stroke-width="2.8"/>
+
+    <!-- τ annotation (below axis) -->
+    <line x1="90"  y1="230" x2="90"  y2="435" stroke="#555" stroke-width="1.4" stroke-dasharray="5,3"/>
+    <line x1="128" y1="230" x2="128" y2="435" stroke="#555" stroke-width="1.4" stroke-dasharray="5,3"/>
+    <line x1="90"  y1="420" x2="128" y2="420" stroke="#444" stroke-width="1.9"/>
+    <polygon points="98,416 87,420 98,424" fill="#444"/>
+    <polygon points="120,416 131,420 120,424" fill="#444"/>
+    <text x="109" y="452" text-anchor="middle" font-size="26" font-style="italic" fill="#222">τ</text>
+
+    <!-- Δ annotation -->
+    <line x1="160" y1="230" x2="160" y2="435" stroke="#888" stroke-width="1.4" stroke-dasharray="5,3"/>
+    <line x1="128" y1="404" x2="160" y2="404" stroke="#555" stroke-width="1.8"/>
+    <polygon points="138,400 127,404 138,408" fill="#555"/>
+    <polygon points="151,400 162,404 151,408" fill="#555"/>
+    <text x="144" y="393" text-anchor="middle" font-size="24" font-style="italic" fill="#444">Δ</text>
+
+    <!-- T annotation (above) -->
+    <line x1="90"  y1="70" x2="290" y2="70" stroke="#222" stroke-width="1.9"/>
+    <polygon points="100,66 89,70 100,74" fill="#222"/>
+    <polygon points="280,66 291,70 280,74" fill="#222"/>
+    <line x1="90"  y1="70" x2="90"  y2="110" stroke="#333" stroke-width="1.3" stroke-dasharray="3,3"/>
+    <line x1="290" y1="70" x2="290" y2="110" stroke="#333" stroke-width="1.3" stroke-dasharray="3,3"/>
+    <text x="190" y="58" text-anchor="middle" font-size="28" font-style="italic" fill="#111" font-weight="bold">T</text>
+
+  </g>
+  <!-- END waveform -->
+
+  <!-- Parameter legend block
+       Internal coords: rect at x=8,y=30 w=258 h=422
+       scale=0.82 → rendered: 8+258=266 * 0.82 = 218px wide
+       Placed at translate(1506, 62) → right edge = 1506+218=1724, within 1728 ✓ -->
+  <g transform="translate(1506,62) scale(0.82)">
+    <rect x="8" y="30" width="258" height="422" rx="10"
+          fill="#f5f5f2" stroke="#bbb" stroke-width="1.2"/>
+    <text x="133" y="60" text-anchor="middle" font-size="17"
+          fill="#222" font-weight="bold" letter-spacing="1.5">PARAMETERS</text>
+    <line x1="22" y1="70" x2="244" y2="70" stroke="#bbb" stroke-width="1"/>
+
+    <!-- A -->
+    <text x="34"  y="104" font-size="23" font-style="italic" fill="#c02000" font-weight="bold">A</text>
+    <text x="62"  y="104" font-size="17" fill="#222" font-weight="bold">Amplitude</text>
+    <text x="62"  y="124" font-size="14" fill="#555">Peak current  [mA / μA]</text>
+    <line x1="22" y1="134" x2="244" y2="134" stroke="#ddd" stroke-width="0.8"/>
+    <!-- τ -->
+    <text x="34"  y="158" font-size="23" font-style="italic" fill="#333">τ</text>
+    <text x="62"  y="158" font-size="17" fill="#222" font-weight="bold">Pulse width</text>
+    <text x="62"  y="178" font-size="14" fill="#555">Duration per phase  [μs]</text>
+    <line x1="22" y1="188" x2="244" y2="188" stroke="#ddd" stroke-width="0.8"/>
+    <!-- Δ -->
+    <text x="34"  y="212" font-size="23" font-style="italic" fill="#555">Δ</text>
+    <text x="62"  y="212" font-size="17" fill="#222" font-weight="bold">Inter-phase gap</text>
+    <text x="62"  y="232" font-size="14" fill="#555">Between phases  [μs]</text>
+    <line x1="22" y1="242" x2="244" y2="242" stroke="#ddd" stroke-width="0.8"/>
+    <!-- T -->
+    <text x="34"  y="266" font-size="23" font-style="italic" fill="#111" font-weight="bold">T</text>
+    <text x="62"  y="266" font-size="17" fill="#222" font-weight="bold">Period</text>
+    <text x="62"  y="286" font-size="14" fill="#555">Time per cycle  [ms]</text>
+    <line x1="22" y1="296" x2="244" y2="296" stroke="#ddd" stroke-width="0.8"/>
+    <!-- f -->
+    <text x="34"  y="320" font-size="23" font-style="italic" fill="#333">f</text>
+    <text x="62"  y="320" font-size="17" fill="#222" font-weight="bold">Frequency</text>
+    <text x="62"  y="340" font-size="14" fill="#555" font-style="italic">f = 1 / T    [Hz]</text>
+    <line x1="22" y1="350" x2="244" y2="350" stroke="#ddd" stroke-width="0.8"/>
+    <!-- D -->
+    <text x="34"  y="374" font-size="23" font-style="italic" fill="#333" font-weight="bold">D</text>
+    <text x="62"  y="374" font-size="17" fill="#222" font-weight="bold">Duty cycle</text>
+    <text x="62"  y="394" font-size="14" fill="#555" font-style="italic">D = τ / T    [0 – 1]</text>
+    <line x1="22" y1="404" x2="244" y2="404" stroke="#ddd" stroke-width="0.8"/>
+    <!-- Note -->
+    <text x="133" y="422" text-anchor="middle" font-size="13" fill="#777">Charge balance:  A · τ = const.</text>
+    <text x="133" y="441" text-anchor="middle" font-size="13" fill="#777">|q₁| = |q₂|  per phase</text>
+  </g>
+  <!-- END (b) ════════════════════════════════════════════════════ -->
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (c)  sDBS  —  Gaussian Spread
+       Occupies right-top-RIGHT: x=1738..2390, y=0..558
+       Available width = 652px, available height = 558px
+
+       Internal layout (at scale=1.0):
+         - grid:     x=80..336  (256px), y=48..304  (256px)
+         - j-axis label: y=326
+         - i-axis label: x=30 rotated
+         - colorbar: x=352..370 (18px wide), y=48..304
+         - colorbar labels (1, 0.5, 0): x=380 (to the right of bar)
+         - w(i,j) label: x=396 rotated
+
+       Total internal width used: ~410px, height ~340px
+       Scale 1.18 → rendered 484px wide, 401px tall
+       Fits in 652px ✓
+       SDBS_TX=1745  SDBS_TY=62  SDBS_S=1.18
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="1742" y="42" font-size="30" font-weight="bold" fill="#111">(c) Spatial DBS — Gaussian Spread (sDBS)</text>
+
+  <g transform="translate(1745,62) scale(1.18)">
+
+    <g id="sdbs-grid"></g>
+
+    <!-- Grid border (on top of cells) -->
+    <rect x="80" y="48" width="256" height="256" fill="none" stroke="#333" stroke-width="2.5"/>
+
+    <!-- Electrode needle, tip near cell (7,7) ≈ pixel (80+7×16, 48+7×16) = (192,160) -->
+    <polygon points="178,0 186,0 184,150 182,160 181,151"
+             fill="#666" stroke="#333" stroke-width="1"
+             transform="rotate(12,182,160)"/>
+    <rect x="175" y="0" width="14" height="10" rx="3"
+          fill="#888" stroke="#333" stroke-width="1"
+          transform="rotate(12,182,160)"/>
+    <circle cx="182" cy="160" r="3.5" fill="#111" stroke="#333" stroke-width="1"
+            transform="rotate(12,182,160)"/>
+
+    <!-- (cx,cy) label — positioned to the right of tip, inside grid -->
+    <text x="196" y="176" font-size="19" font-weight="bold" fill="#111" font-style="italic">
+      <tspan>(c</tspan><tspan baseline-shift="sub" font-size="13">x</tspan>
+      <tspan>, c</tspan><tspan baseline-shift="sub" font-size="13">y</tspan><tspan>)</tspan>
+    </text>
+
+    <!-- j → axis label (below grid) -->
+    <text x="208" y="324" text-anchor="middle" font-size="22" fill="#111" font-style="italic" font-weight="bold">j →</text>
+
+    <!-- i → axis label (left of grid, rotated) -->
+    <text x="30" y="176" text-anchor="middle" font-size="22" fill="#111" font-style="italic" font-weight="bold"
+          transform="rotate(-90,30,176)">i →</text>
+
+    <!-- Colour bar — x=352..370, y=48..304 (right of grid with gap) -->
+    <rect x="352" y="48" width="18" height="256" fill="url(#cbar)" stroke="#555" stroke-width="1.2"/>
+
+    <!-- Colour bar tick labels — x=374 (right of bar), clearly outside -->
+    <text x="374" y="52"  text-anchor="start" font-size="17" fill="#111" font-weight="bold">1</text>
+    <text x="374" y="176" text-anchor="start" font-size="17" fill="#111" font-weight="bold">0.5</text>
+    <text x="374" y="306" text-anchor="start" font-size="17" fill="#111" font-weight="bold">0</text>
+
+    <!-- w(i,j) rotated label — further right of tick labels -->
+    <text x="412" y="176" text-anchor="middle" font-size="19" fill="#111" font-weight="bold"
+          transform="rotate(90,412,176)">w(i,j)</text>
+
+  </g>
+  <!-- END (c) sDBS ════════════════════════════════════════════════ -->
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (d)  rDBS  —  4 grids + timeline + clock
+       Occupies right-bottom: x=1090..2390, y=572..1520
+       Available: 1300px wide, 948px tall
+
+       Internal content (at scale=1.0):
+         grids: 4 × 208px wide = 832px, plus sector labels, timeline ~400px tall
+         clock: r=105, centred at x=441, cy=578 → total height ~705px including labels
+       Scale 0.88 → 0.88×960 = 845px wide ✓, 0.88×705 = 620px tall ✓
+       RDBS_TX=1095  RDBS_TY=598  RDBS_S=0.88
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="1095" y="590" font-size="30" font-weight="bold" fill="#111">(d) Rotational DBS (rDBS)</text>
+
+  <g transform="translate(1095,614) scale(0.88)">
+
+    <g id="rdbs-grids"></g>
+
+    <!-- Sector titles above grids -->
+    <text x="114"  y="42" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Sector 0</text>
+    <text x="332"  y="42" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Sector 1</text>
+    <text x="550"  y="42" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Sector 2</text>
+    <text x="768"  y="42" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Sector 3</text>
+
+    <!-- Degree range labels below grids -->
+    <text x="114"  y="277" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">0° – 90°</text>
+    <text x="332"  y="277" text-anchor="middle" font-size="20" font-weight="bold" fill="#cc5500">90° – 180°</text>
+    <text x="550"  y="277" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a6e1a">180° – 270°</text>
+    <text x="768"  y="277" text-anchor="middle" font-size="20" font-weight="bold" fill="#7030a0">270° – 360°</text>
+
+    <!-- t-interval labels -->
+    <text x="114"  y="299" text-anchor="middle" font-size="17" fill="#333">t ∈ [0, T<tspan baseline-shift="sub" font-size="13">s</tspan>)</text>
+    <text x="332"  y="299" text-anchor="middle" font-size="17" fill="#333">t ∈ [T<tspan baseline-shift="sub" font-size="13">s</tspan>, 2T<tspan baseline-shift="sub" font-size="13">s</tspan>)</text>
+    <text x="550"  y="299" text-anchor="middle" font-size="17" fill="#333">t ∈ [2T<tspan baseline-shift="sub" font-size="13">s</tspan>, 3T<tspan baseline-shift="sub" font-size="13">s</tspan>)</text>
+    <text x="768"  y="299" text-anchor="middle" font-size="17" fill="#333">t ∈ [3T<tspan baseline-shift="sub" font-size="13">s</tspan>, 4T<tspan baseline-shift="sub" font-size="13">s</tspan>)</text>
+
+    <!-- TIMELINE -->
+    <line x1="10" y1="396" x2="885" y2="396" stroke="#333" stroke-width="2.2" marker-end="url(#ah-t)"/>
+    <text x="900" y="403" font-size="23" fill="#333" font-style="italic" font-weight="bold">t</text>
+
+    <rect x="10"  y="330" width="218" height="63" fill="#ddeeff" stroke="#2255aa" stroke-width="2"/>
+    <text x="119" y="358" text-anchor="middle" font-size="19" font-weight="bold" fill="#2255aa">Sector 0</text>
+    <text x="119" y="381" text-anchor="middle" font-size="16" fill="#2255aa">0° – 90°</text>
+
+    <rect x="228" y="330" width="218" height="63" fill="#fde8cc" stroke="#cc5500" stroke-width="2"/>
+    <text x="337" y="358" text-anchor="middle" font-size="19" font-weight="bold" fill="#cc5500">Sector 1</text>
+    <text x="337" y="381" text-anchor="middle" font-size="16" fill="#cc5500">90° – 180°</text>
+
+    <rect x="446" y="330" width="218" height="63" fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2"/>
+    <text x="555" y="358" text-anchor="middle" font-size="19" font-weight="bold" fill="#1a6e1a">Sector 2</text>
+    <text x="555" y="381" text-anchor="middle" font-size="16" fill="#1a6e1a">180° – 270°</text>
+
+    <rect x="664" y="330" width="218" height="63" fill="#f0e0ff" stroke="#7030a0" stroke-width="2"/>
+    <text x="773" y="358" text-anchor="middle" font-size="19" font-weight="bold" fill="#7030a0">Sector 3</text>
+    <text x="773" y="381" text-anchor="middle" font-size="16" fill="#7030a0">270° – 360°</text>
+
+    <!-- Tick marks + labels -->
+    <line x1="10"  y1="391" x2="10"  y2="407" stroke="#333" stroke-width="2"/>
+    <line x1="228" y1="391" x2="228" y2="407" stroke="#333" stroke-width="2"/>
+    <line x1="446" y1="391" x2="446" y2="407" stroke="#333" stroke-width="2"/>
+    <line x1="664" y1="391" x2="664" y2="407" stroke="#333" stroke-width="2"/>
+    <line x1="882" y1="391" x2="882" y2="407" stroke="#333" stroke-width="2"/>
+    <text x="10"  y="426" text-anchor="middle" font-size="17" fill="#222">0</text>
+    <text x="228" y="426" text-anchor="middle" font-size="17" fill="#222">T<tspan baseline-shift="sub" font-size="12">s</tspan></text>
+    <text x="446" y="426" text-anchor="middle" font-size="17" fill="#222">2T<tspan baseline-shift="sub" font-size="12">s</tspan></text>
+    <text x="664" y="426" text-anchor="middle" font-size="17" fill="#222">3T<tspan baseline-shift="sub" font-size="12">s</tspan></text>
+    <text x="882" y="426" text-anchor="middle" font-size="17" fill="#222">4T<tspan baseline-shift="sub" font-size="12">s</tspan></text>
+
+    <!-- Repeats -->
+    <text x="912" y="372" font-size="28" fill="#555">↻</text>
+    <text x="913" y="344" text-anchor="middle" font-size="15" fill="#666" font-style="italic">repeats</text>
+
+    <!-- f_rot equation — centred on CK_CX=1160, below clock bottom (CK_CY+R+28 = 175+100+28 = 303) -->
+    <text x="1160" y="316" text-anchor="middle" font-size="19" fill="#333" font-style="italic">
+      f<tspan baseline-shift="sub" font-size="13">rot</tspan>
+      <tspan> = 5 Hz,  T</tspan><tspan baseline-shift="sub" font-size="13">s</tspan>
+      <tspan> = 50 ms</tspan>
+    </text>
+
+    <!--
+    ══════════════════════════════════════════════════════
+    CLOCK — modular block
+    ┌─ TO MOVE THE ENTIRE CLOCK: change CK_CX and CK_CY ─┐
+       CK_CX = 1160   (centre x; grids end at x=872)
+       CK_CY = 175    (centre y; grids y=55..263, mid=159, +16 for label clearance)
+       CK_R  = 100    (radius)
+    └─────────────────────────────────────────────────────┘
+    All literal coords below = (CK_CX ± n, CK_CY ± n).
+    Derived key points:
+      top    = (CK_CX,     CK_CY-R)   = (1160,  75)
+      bottom = (CK_CX,     CK_CY+R)   = (1160, 275)
+      left   = (CK_CX-R,   CK_CY)     = (1060, 175)
+      right  = (CK_CX+R,   CK_CY)     = (1260, 175)
+
+    Rotation arrow: ON the circle rim (r=100), left side,
+    showing CW rotation S0→S1.
+    Using SVG arc angles (0°=right, 90°=down, CCW positive in math but SVG Y flips):
+      Start at SVG-angle 225° (top-left area of rim):
+        x = CK_CX + R*cos(225°) = 1160 + 100*(-0.7071) = 1160 - 70.7 ≈ 1089
+        y = CK_CY + R*sin(225°) = 175  + 100*(-0.7071) = 175  - 70.7 ≈ 104
+      End at SVG-angle 135° (bottom-left area of rim):
+        x = CK_CX + R*cos(135°) = 1160 + 100*(-0.7071) = 1089
+        y = CK_CY + R*sin(135°) = 175  + 100*(+0.7071) = 175  + 70.7 ≈ 246
+      Arc: M 1089,104  A 100,100 0 0,1 1089,246   (sweep=1 → CW in SVG)
+    Tangent at end (SVG 135°) is perpendicular to radius:
+      radius direction = (cos135°, sin135°) = (-0.707, +0.707)
+      tangent CW = rotate radius 90° CCW = (-sin135°, cos135°) ... wait, CW tangent:
+        CW tangent = (sin θ, -cos θ) at angle θ in SVG convention
+        At θ=135°: (sin135°, -cos135°) = (+0.707, +0.707) → points down-right ✓
+    Arrowhead at (1089,246): tip pointing in (+0.707,+0.707) direction.
+      tip = (1089, 246)
+      base-left  = tip - 14*(+0.707,+0.707) + 7*(-0.707,+0.707) = (1089-9.9-4.9, 246-9.9+4.9) = (1074, 241)
+      base-right = tip - 14*(+0.707,+0.707) - 7*(-0.707,+0.707) = (1089-9.9+4.9, 246-9.9-4.9) = (1084, 231)
+    ══════════════════════════════════════════════════════
+    -->
+
+    <!-- S0: top-left, blue   M CK_CX,CK_CY  L left  A→ top  Z -->
+    <path d="M 1160,175 L 1060,175 A 100,100 0 0,1 1160,75 Z"
+          fill="#ddeeff" stroke="#2255aa" stroke-width="2.2"/>
+    <!-- S1: bottom-left, orange   L bottom  A→ left  Z -->
+    <path d="M 1160,175 L 1160,275 A 100,100 0 0,1 1060,175 Z"
+          fill="#fde8cc" stroke="#cc5500" stroke-width="2.2"/>
+    <!-- S2: bottom-right, green   L right  A→ bottom  Z -->
+    <path d="M 1160,175 L 1260,175 A 100,100 0 0,1 1160,275 Z"
+          fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2.2"/>
+    <!-- S3: top-right, purple   L top  A→ right  Z -->
+    <path d="M 1160,175 L 1160,75  A 100,100 0 0,1 1260,175 Z"
+          fill="#f0e0ff" stroke="#7030a0" stroke-width="2.2"/>
+
+    <!-- Spokes -->
+    <line x1="1160" y1="175" x2="1160" y2="75"  stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+    <line x1="1160" y1="175" x2="1260" y2="175" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+    <line x1="1160" y1="175" x2="1160" y2="275" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+    <line x1="1160" y1="175" x2="1060" y2="175" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+
+    <!-- Degree labels  (CK_CX, CK_CY ± R ± gap) -->
+    <!-- 0°   top    (CK_CX,   CK_CY-R-14) = (1160,  61) -->
+    <text x="1160" y="61"  text-anchor="middle" font-size="19" fill="#111" font-weight="bold">0°</text>
+    <!-- 90°  right  (CK_CX+R+16, CK_CY+6) = (1276, 181) -->
+    <text x="1276" y="181" text-anchor="start"  font-size="19" fill="#111" font-weight="bold">90°</text>
+    <!-- 180° bottom (CK_CX,   CK_CY+R+20) = (1160, 295) -->
+    <text x="1160" y="295" text-anchor="middle" font-size="19" fill="#111" font-weight="bold">180°</text>
+    <!-- 270° left   (CK_CX-R-16, CK_CY+6) = (1044, 181) -->
+    <text x="1044" y="181" text-anchor="end"    font-size="19" fill="#111" font-weight="bold">270°</text>
+
+    <!-- Sector labels — quadrant centres at (CK_CX ± R/2, CK_CY ± R/2) = ±50 -->
+    <!-- S0 top-left    (1110, 125) -->
+    <text x="1110" y="125" text-anchor="middle" font-size="19" font-weight="bold" fill="#2255aa">S0</text>
+    <text x="1110" y="145" text-anchor="middle" font-size="14"                    fill="#2255aa">0°–90°</text>
+    <!-- S1 bottom-left (1110, 225) -->
+    <text x="1110" y="222" text-anchor="middle" font-size="19" font-weight="bold" fill="#cc5500">S1</text>
+    <text x="1110" y="242" text-anchor="middle" font-size="14"                    fill="#cc5500">90°–180°</text>
+    <!-- S2 bottom-right (1210, 225) -->
+    <text x="1210" y="222" text-anchor="middle" font-size="19" font-weight="bold" fill="#1a6e1a">S2</text>
+    <text x="1210" y="242" text-anchor="middle" font-size="14"                    fill="#1a6e1a">180°–270°</text>
+    <!-- S3 top-right   (1210, 125) -->
+    <text x="1210" y="125" text-anchor="middle" font-size="19" font-weight="bold" fill="#7030a0">S3</text>
+    <text x="1210" y="145" text-anchor="middle" font-size="14"                    fill="#7030a0">270°–360°</text>
+
+    <!-- Centre dot -->
+    <circle cx="1160" cy="175" r="6" fill="#111" stroke="#fff" stroke-width="1.5"/>
+    <text x="1172" y="194" font-size="15" fill="#333" font-style="italic">
+      (c<tspan baseline-shift="sub" font-size="11">x</tspan>, c<tspan baseline-shift="sub" font-size="11">y</tspan>)
+    </text>
+
+    <!-- CW rotation arrow: ON the rim (r=100), left side, S0→S1
+         Arc from (1089,104) to (1089,246), sweep=1 (CW in SVG) -->
+    <!-- <path d="M 1089,104 A 100,100 0 0,1 1089,246"
+          fill="none" stroke="#333" stroke-width="2.5"/> -->
+          <path d="M 1058,104 A 100,100 0 0,0 1058,246"
+      fill="none" stroke="#333" stroke-width="2.5"/>
+    <!-- Arrowhead at (1089,246): tip pointing (+0.707,+0.707) i.e. down-right
+         Computed: tip=(1058,246), p1=(1043,241), p2=(1053,231) -->
+    <polygon points="1058,246 1043,241 1053,231" fill="#333"/>
+
+    <!-- f_rot label: to the left of the arc, vertically centred on clock -->
+    <text x="1072" y="180" text-anchor="end" font-size="18" fill="#333" font-style="italic">f<tspan baseline-shift="sub" font-size="13">rot</tspan></text>
+
+  </g>
+  <!-- END (d) rDBS ════════════════════════════════════════════════ -->
+
+</svg>
+
+<script>
+(function(){
+  /*
+  ══════════════════════════════════════════════════════════════════
+  LAYOUT CONSTANTS  — update these to reposition entire sub-panels.
+  The values here must match the translate()/scale() in the SVG above.
+
+  Panel (a) BG:     BG_TX=18,    BG_TY=68,   BG_S=0.93   (static)
+  Panel (b) Pulse:  PULSE_TX=1098, PULSE_TY=62, PULSE_S=0.68 (static)
+  Panel (b) Params: PARAM_TX=1506, PARAM_TY=62, PARAM_S=0.82 (static)
+  Panel (c) sDBS:   SDBS_TX=1745,  SDBS_TY=62,  SDBS_S=1.18  (JS grid)
+  Panel (d) rDBS:   RDBS_TX=1095,  RDBS_TY=614, RDBS_S=0.88  (JS grids)
+  ══════════════════════════════════════════════════════════════════
+  */
+
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // ── (c) sDBS grid ─────────────────────────────────────────────
+  // Internal grid: top-left at (80,48), cell=16, N=16
+  // SDBS_TX=1745  SDBS_TY=62  SDBS_S=1.18
+  const sN=16, sCell=16, sox=80, soy=48, sc=7, sSigma=4;
+  const sGrid = document.getElementById('sdbs-grid');
+  for(let i=0;i<sN;i++){
+    for(let j=0;j<sN;j++){
+      const w = Math.exp(-((i-sc)**2+(j-sc)**2)/(2*sSigma**2));
+      const r = Math.round(255-(255-204)*w);
+      const g = Math.round(255-(255-34)*w);
+      const b = Math.round(255-255*w);
+      const rect = document.createElementNS(ns,'rect');
+      rect.setAttribute('x', sox + j*sCell);
+      rect.setAttribute('y', soy + i*sCell);
+      rect.setAttribute('width',  sCell);
+      rect.setAttribute('height', sCell);
+      rect.setAttribute('fill',   `rgb(${r},${g},${b})`);
+      rect.setAttribute('stroke', '#ccc');
+      rect.setAttribute('stroke-width','0.4');
+      sGrid.appendChild(rect);
+    }
+  }
+
+  // ── (d) rDBS grids ─────────────────────────────────────────────
+  // RDBS_TX=1095  RDBS_TY=614  RDBS_S=0.88
+  const rN=16, rCell=13, half=rN/2;
+  const gridOrigins = [{x:10,y:55},{x:228,y:55},{x:446,y:55},{x:664,y:55}];
+  const sectorQuads = [
+    {rMin:0, rMax:8, cMin:0, cMax:8 },
+    {rMin:8, rMax:16,cMin:0, cMax:8 },
+    {rMin:8, rMax:16,cMin:8, cMax:16},
+    {rMin:0, rMax:8, cMin:8, cMax:16}
+  ];
+  const activeColors = ['#2255aa','#cc5500','#1a6e1a','#7030a0'];
+  const hexBase = {
+    '#2255aa':[34,85,170],
+    '#cc5500':[204,85,0],
+    '#1a6e1a':[26,110,26],
+    '#7030a0':[112,48,160]
+  };
+  const rGrids = document.getElementById('rdbs-grids');
+  const c_idx=7, rSigma=4;
+
+  gridOrigins.forEach((origin, sIdx) => {
+    const quad = sectorQuads[sIdx];
+    const col  = activeColors[sIdx];
+    // Fill cells
+    for(let i=0;i<rN;i++){
+      for(let j=0;j<rN;j++){
+        const isActive = i>=quad.rMin && i<quad.rMax && j>=quad.cMin && j<quad.cMax;
+        let fill;
+        if(isActive){
+          const w = Math.exp(-((i-c_idx)**2+(j-c_idx)**2)/(2*rSigma**2));
+          const [r0,g0,b0] = hexBase[col];
+          fill = `rgb(${Math.round(255-(255-r0)*w)},${Math.round(255-(255-g0)*w)},${Math.round(255-(255-b0)*w)})`;
+        } else { fill = '#f0f0f0'; }
+        const rect = document.createElementNS(ns,'rect');
+        rect.setAttribute('x', origin.x + j*rCell);
+        rect.setAttribute('y', origin.y + i*rCell);
+        rect.setAttribute('width',  rCell);
+        rect.setAttribute('height', rCell);
+        rect.setAttribute('fill',   fill);
+        rect.setAttribute('stroke', '#ccc');
+        rect.setAttribute('stroke-width','0.3');
+        rGrids.appendChild(rect);
+      }
+    }
+    // Outer border
+    const border = document.createElementNS(ns,'rect');
+    border.setAttribute('x', origin.x); border.setAttribute('y', origin.y);
+    border.setAttribute('width', rN*rCell); border.setAttribute('height', rN*rCell);
+    border.setAttribute('fill','none'); border.setAttribute('stroke', col);
+    border.setAttribute('stroke-width','2.5');
+    rGrids.appendChild(border);
+    // Quadrant dividers
+    const mid = half*rCell;
+    const vl = document.createElementNS(ns,'line');
+    vl.setAttribute('x1',origin.x+mid); vl.setAttribute('y1',origin.y);
+    vl.setAttribute('x2',origin.x+mid); vl.setAttribute('y2',origin.y+rN*rCell);
+    vl.setAttribute('stroke','#999'); vl.setAttribute('stroke-width','1');
+    rGrids.appendChild(vl);
+    const hl = document.createElementNS(ns,'line');
+    hl.setAttribute('x1',origin.x);          hl.setAttribute('y1',origin.y+mid);
+    hl.setAttribute('x2',origin.x+rN*rCell); hl.setAttribute('y2',origin.y+mid);
+    hl.setAttribute('stroke','#999'); hl.setAttribute('stroke-width','1');
+    rGrids.appendChild(hl);
+    // Active-quadrant highlight
+    const hi = document.createElementNS(ns,'rect');
+    hi.setAttribute('x', origin.x + quad.cMin*rCell);
+    hi.setAttribute('y', origin.y + quad.rMin*rCell);
+    hi.setAttribute('width',  (quad.cMax-quad.cMin)*rCell);
+    hi.setAttribute('height', (quad.rMax-quad.rMin)*rCell);
+    hi.setAttribute('fill','none'); hi.setAttribute('stroke', col);
+    hi.setAttribute('stroke-width','3');
+    rGrids.appendChild(hi);
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combined Figure</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
+</style>
+</head>
+<body>
+
+<!--
+  ══════════════════════════════════════════════════════════════════
+  MASTER LAYOUT  (all coordinates in viewBox units, 2400 × 1520)
+  ──────────────────────────────────────────────────────────────────
+  Left panel  (a) BG:   x=0..1070,  y=0..1520
+              inner g:  translate(BG_TX=18, BG_TY=68) scale(BG_S=0.93)
+
+  Right column x=1090..2390 (width=1300), split:
+    Top row    (height ~520):
+      (b) Pulse + param legend   x=1090..1720  (w=630)
+      (c) sDBS grid              x=1730..2390  (w=660)
+    Bottom row (height ~990):
+      (d) rDBS                   x=1090..2390
+
+  Sub-panel label y positions (absolute):
+    (a) y=44
+    (b) y=44,  inner g at translate(PULSE_TX=1095, PULSE_TY=62) scale(PULSE_S=0.68)
+    (c) y=44,  inner g at translate(SDBS_TX=1745,  SDBS_TY=62)  scale(SDBS_S=1.15)
+    (d) y=590, inner g at translate(RDBS_TX=1095,  RDBS_TY=614) scale(RDBS_S=0.88)
+  ══════════════════════════════════════════════════════════════════
+-->
+
+<svg id="main-svg" viewBox="0 0 2500 1520" width="2400" height="1520"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="ah-blk" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#111"/>
+    </marker>
+    <marker id="ah-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#c0392b"/>
+    </marker>
+    <marker id="ah-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#1a7a1a"/>
+    </marker>
+    <marker id="ah-pur" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#7030a0"/>
+    </marker>
+    <marker id="ah-t" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#333"/>
+    </marker>
+    <linearGradient id="cbar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#cc2200"/>
+      <stop offset="50%"  stop-color="#f0a000"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2400" height="1520" fill="#ffffff"/>
+
+  <!-- Panel dividers -->
+  <!-- <line x1="1050" y1="10"  x2="1050" y2="1510" stroke="#ccc" stroke-width="1.2" stroke-dasharray="6,4"/>
+  <line x1="1090" y1="560" x2="2390" y2="560"  stroke="#ccc" stroke-width="1.2" stroke-dasharray="6,4"/>
+  <line x1="1800" y1="10"  x2="1800" y2="558"  stroke="#ccc" stroke-width="1.2" stroke-dasharray="6,4"/> -->
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (a)  BASAL GANGLIA NETWORK
+       BG_TX=18  BG_TY=68  BG_S=0.93
+       The BG SVG coordinate space is ~1000×1090 at scale 1.0.
+       Connections corrected vs. original:
+         - SNc→D1(+δ): clean L-path, no overlap
+         - SNc→D2(−δ): single dashed path, proper routing
+         - Removed extraneous extra purple polylines
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="18" y="10" font-size="35" font-weight="bold" fill="#111">(a) Basal Ganglia Network</text>
+
+  <g transform="translate(0,68) scale(1.17)">
+
+    <!-- ── Decision Making Task Box ── -->
+    <!-- ── Decision Making Task Box ── -->
+    <rect x="1" y="260" width="280" height="348" rx="8"
+          fill="#f9f9f9" stroke="#444" stroke-width="2.2"/>
+    <text x="140" y="296" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Decision Making Task</text>
+    <!-- <text x="131" y="321" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Task</text> -->
+
+    <!-- Reward plot axes -->
+    <line x1="30" y1="425" x2="265" y2="425" stroke="#111" stroke-width="2.5"/>
+    <line x1="30" y1="345" x2="30"  y2="425" stroke="#111" stroke-width="2.5"/>
+    <text x="135" y="448" text-anchor="middle" font-size="22" fill="#222" font-style="italic" font-weight="bold">Reward</text>
+    <text x="15"  y="395" text-anchor="middle" font-size="22" fill="#222" font-style="italic" font-weight="bold"
+          transform="rotate(-90,11,385)">P(R)</text>
+
+    <!-- Arm C -->
+    <path d="M 30,425 C 30,425 44,425 60,404 C 72,387 74,380 80,378 C 86,380 88,387 100,404 C 116,425 130,425 130,425"
+          stroke="#888" stroke-width="3.5" fill="#88888818"/>
+    <line x1="80" y1="378" x2="80" y2="425" stroke="#888" stroke-width="1.1" stroke-dasharray="3,2"/>
+    <text x="80" y="360" text-anchor="middle" font-size="25" fill="#888" font-style="italic" font-weight="bold">μ<tspan baseline-shift="sub" 
+      font-size="18">C</tspan></text>
+    <text x="80" y="410" text-anchor="middle" font-size="25" font-weight="bold" fill="#888">C</text>
+
+    <!-- Arm A -->
+    <path d="M 108,425 C 118,425 132,425 146,402 C 158,382 160,372 163,370 C 166,372 168,382 180,402 C 194,425 208,425 208,425"
+          stroke="#6699cc" stroke-width="3.5" fill="#6699cc18"/>
+    <line x1="163" y1="370" x2="163" y2="425" stroke="#6699cc" stroke-width="1.1" stroke-dasharray="3,2"/>
+     <text x="163" y="352" text-anchor="middle" font-size="25" fill="#6699cc" font-style="italic" font-weight="bold">μ<tspan baseline-shift="sub" 
+      font-size="18">A</tspan></text>
+    <text x="163" y="410" text-anchor="middle" font-size="25" font-weight="bold" fill="#6699cc">A</text>
+
+    <!-- Arm B (winner) -->
+    <path d="M 186,425 C 196,425 208,410 215,390 C 222,380 223,358 225,356 C 227,368 228,385 235,395 C 255,439 295,422 265,425"
+          stroke="#2255aa" stroke-width="3.5" fill="#2255aa44"/>
+    <line x1="225" y1="356" x2="225" y2="425" stroke="#2２55aa" stroke-width="1.3" stroke-dasharray="3,２"/>
+    <text x="225" y="338" text-anchor="middle" font-size="25" fill="#2２55aa" font-style="italic" font-weight="bold">μ<tspan baseline-shift="sub" 
+      font-size="18">B</tspan></text>
+    <text x="225" y="410" text-anchor="middle" font-size="25" font-weight="bold" fill="#2255aa">B</text>
+
+    <!-- Cards -->
+    <rect x="28"  y="465" width="58" height="66" rx="5" fill="#fff"    stroke="#555" stroke-width="2"/>
+    <text x="57"  y="505" text-anchor="middle" font-size="25" font-weight="bold" fill="#333">A</text>
+    <rect x="101" y="465" width="58" height="66" rx="5" fill="#abcef5" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="130" y="505" text-anchor="middle" font-size="25" font-weight="bold" fill="#2255aa">B</text>
+    <rect x="174" y="465" width="58" height="66" rx="5" fill="#fff"    stroke="#555" stroke-width="2"/>
+    <text x="203" y="505" text-anchor="middle" font-size="25" font-weight="bold" fill="#333">C</text>
+
+    <!-- Reward formula -->
+    <text x="140" y="568" text-anchor="middle" font-size="25" fill="#111">
+      <tspan font-style="italic">R</tspan><tspan baseline-shift="sub" font-size="18">B</tspan>
+      <tspan> ~ 𝒩(μ</tspan><tspan baseline-shift="sub" font-size="18">B</tspan>
+      <tspan>, σ</tspan><tspan baseline-shift="sub" font-size="18">B</tspan>
+      <tspan baseline-shift="super" font-size="18">2</tspan><tspan>)</tspan>
+    </text>
+    <text x="131" y="595" text-anchor="middle" font-size="20" fill="#444">(reward drawn from B)</text>
+
+    <!-- SNc -->
+    <ellipse cx="380" cy="605" rx="62" ry="50" fill="#f3eafa" stroke="#7030a0" stroke-width="2.5"/>
+    <text x="380" y="605" text-anchor="middle" font-size="28" font-weight="bold" fill="#7030a0">SNc</text>
+    <text x="380" y="629" text-anchor="middle" font-size="21" font-style="italic" fill="#7030a0">δ = R − Q</text>
+
+    <!--
+    RIGHT COLUMN SHIFT: GPe/STN moved +100px further right vs previous version.
+    NEURON SPACING: A/B/C neurons 60px apart.
+    Cortex x=460, w=470 (spans D1+D2). Centre=695. Neurons A=530, B=695, C=860.
+    D1 x=460, w=180. Neurons A=500, B=560, C=620.
+    D2 x=750, w=180. Neurons A=760, B=820, C=880.
+    GPe x=880, STN x=880 (both +100 from D2 right edge=930).
+    GPe cols (c0,c1,c2): 912, 970, 1028.  STN cols: 914, 976, 1038.
+    GPe↔STN lines: x=952 (down), x=982 (up).
+    D2→GPe: x1=930.
+    D1 → GPi: x=500,560,620.  GPi/Thalamus neurons: A=500, B=560, C=620.
+    SNc→D1 +δ: route to D1 centre x=560.
+    SNc→D2 −δ: route to D2 centre x=820.
+    STN→GPi: from cols 914,976,1038 → GPi neurons 502,562,622.
+    -->
+
+
+
+    <!-- Cortex  x=460, w=360 (spans D1+D2 to x=820). Centre=640. Neurons A=530, B=640, C=750 -->
+    <rect x="460" y="98" width="360" height="72" rx="8" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="640" y="133" text-anchor="middle" font-size="29" font-weight="bold" fill="#2255aa">Cortex</text>
+    <circle cx="530" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="640" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="750" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- Input labels A/B/C above cortex neurons -->
+    <text x="530" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">A</text>
+    <line x1="530" y1="27" x2="530" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+    <text x="640" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">B</text>
+    <line x1="640" y1="27" x2="640" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+    <text x="750" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">C</text>
+    <line x1="750" y1="27" x2="750" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+
+    <!-- Cortex → D1/D2: each cortex neuron projects to matching D1 and D2 neuron -->
+    <!-- Cortex A(530) → D1 A(500), D2 A(660) -->
+    <line x1="526" y1="160" x2="498" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="534" y1="160" x2="662" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <!-- Cortex B(640) → D1 B(560), D2 B(720) -->
+    <line x1="636" y1="160" x2="558" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="644" y1="160" x2="722" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <!-- Cortex C(750) → D1 C(620), D2 C(780) -->
+    <line x1="746" y1="160" x2="618" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="754" y1="160" x2="782" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+
+    <!-- D1  x=460, w=180, centre=550. Neurons A=500, B=560, C=620 -->
+    <rect x="460" y="232" width="180" height="82" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="550" y="257" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">D₁</text>
+    <text x="500" y="276" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">A</text>
+    <text x="560" y="276" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">B</text>
+    <text x="620" y="276" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">C</text>
+    <circle cx="500" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="560" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="620" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- D2  x=640, neurons A=660, B=720, C=780. Right edge=820, gap to GPe(880)=60px -->
+    <rect x="640" y="232" width="180" height="82" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="730" y="257" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">D₂</text>
+    <text x="660" y="276" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">A</text>
+    <text x="720" y="276" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">B</text>
+    <text x="780" y="276" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">C</text>
+    <circle cx="660" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="720" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="780" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- GPe  x=880 (+100 from before) -->
+    <rect x="880" y="232" width="190" height="170" rx="7" fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="975" y="258" text-anchor="middle" font-size="26" font-weight="bold" fill="#c0392b">GPe</text>
+    <rect x="888" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="912" y="280" text-anchor="middle" font-size="20" fill="#c0392b" font-style="italic">c₀</text>
+    <circle cx="912" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="912" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="912" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="912" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <rect x="946" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="970" y="280" text-anchor="middle" font-size="20" fill="#c0392b" font-style="italic">c₁</text>
+    <circle cx="970" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="970" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="970" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="970" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <rect x="1004" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="1028" y="280" text-anchor="middle" font-size="20" fill="#c0392b" font-style="italic">c₂</text>
+    <circle cx="1028" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="1028" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="1028" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="1028" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+
+    <!-- STN  x=880 (+100 from before) -->
+    <rect x="880" y="458" width="200" height="170" rx="7" fill="#f0fff0" stroke="#1a7a1a" stroke-width="2.5"/>
+    <text x="980" y="483" text-anchor="middle" font-size="26" font-weight="bold" fill="#1a7a1a">STN</text>
+    <rect x="888" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="914" y="510" text-anchor="middle" font-size="20" fill="#1a7a1a" font-style="italic">c₀</text>
+    <circle cx="914" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="914" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="914" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="914" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <rect x="950" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="976" y="510" text-anchor="middle" font-size="20" fill="#1a7a1a" font-style="italic">c₁</text>
+    <circle cx="976" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="976" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="976" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="976" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <rect x="1012" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="1038" y="510" text-anchor="middle" font-size="20" fill="#1a7a1a" font-style="italic">c₂</text>
+    <circle cx="1038" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="1038" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="1038" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="1038" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+
+    <!-- (old GPi and Thalamus blocks at x=390 removed — correct ones are below in CONNECTIONS) -->
+
+    <!-- ══ CONNECTIONS ══ -->
+
+    <!-- R: task box right edge → SNc -->
+    <polyline points="280,515 360,515 360,561"
+              stroke="#111" stroke-width="2.0" stroke-dasharray="8,5" fill="none" marker-end="url(#ah-blk)"/>
+    <text x="335" y="504" text-anchor="middle" font-size="24" font-weight="bold" font-style="italic" fill="#111">R</text>
+
+    <!-- D2 → GPe: D2 right edge=820, GPe left edge=880, 60px gap -->
+    <line x1="820" y1="274" x2="878" y2="274" stroke="#c0392b" stroke-width="2.0" marker-end="url(#ah-red)"/>
+
+    <!-- GPe ↔ STN: cols +100 from before -->
+    <line x1="952" y1="402" x2="952" y2="456" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="982" y1="456" x2="982" y2="402" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+    <!-- Q-value collect line: horizontal at y=430 (below D1 neurons), left to x=400, down to SNc -->
+    <polyline points="620,430 400,430 400,561"
+              stroke="#7030a0" stroke-width="2" stroke-dasharray="8,5" fill="none" marker-end="url(#ah-pur)"/>
+    <!-- Q-value label: above D1 box, clear of everything -->
+    <text x="420" y="420" text-anchor="middle" font-size="24" font-style="italic" fill="#7030a0" font-weight="bold">Q-value</text>
+    <!-- Junction dots at D1 neuron x positions on the collect line -->
+    <circle cx="500" cy="430" r="6" fill="#7030a0"/>
+    <circle cx="560" cy="430" r="6" fill="#7030a0"/>
+    <circle cx="620" cy="430" r="6" fill="#7030a0"/>
+    <!-- Short drops from each D1 neuron bottom (y=302) to collect line (y=430) -->
+    <line x1="500" y1="302" x2="500" y2="430" stroke="#7030a0" stroke-width="1.3" stroke-dasharray="4,2"/>
+    <line x1="560" y1="302" x2="560" y2="430" stroke="#7030a0" stroke-width="1.3" stroke-dasharray="4,2"/>
+    <line x1="620" y1="302" x2="620" y2="430" stroke="#7030a0" stroke-width="1.3" stroke-dasharray="4,2"/>
+    <line x1="460" y1="430" x2="620" y2="430" stroke="#7030a0" stroke-width="1.3" stroke-dasharray="4,2"/>
+
+    <!-- D1 → GPi (3 lines, widely spaced, Q labels beside each) -->
+    <line x1="500" y1="302" x2="500" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="553" y="420" text-anchor="end"    font-size="20" font-style="italic" font-weight="bold" fill="#c0392b">Q(A)</text>
+    <line x1="560" y1="302" x2="560" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="590" y="420" text-anchor="middle" font-size="20" font-style="italic" font-weight="bold" fill="#c0392b">Q(B)</text>
+    <line x1="620" y1="302" x2="620" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="628" y="420" text-anchor="start"  font-size="20" font-style="italic" font-weight="bold" fill="#c0392b">Q(C)</text>
+
+    <!-- STN → GPi: STN neuron cols now 914, 976, 1038 -->
+    <line x1="914" y1="616" x2="502" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+    <line x1="976" y1="616" x2="562" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+    <line x1="1038" y1="616" x2="622" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+    <!-- GPi  x=460, w=340, centre=630. Neurons A=500, B=560, C=620 -->
+    <rect x="460" y="720" width="340" height="85" rx="7" fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="630" y="749" text-anchor="middle" font-size="26" font-weight="bold" fill="#c0392b">GPi</text>
+    <circle cx="500" cy="768" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+    <circle cx="560" cy="768" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+    <circle cx="620" cy="768" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+
+    <!-- GPi → Thalamus -->
+    <line x1="500" y1="805" x2="500" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="560" y1="805" x2="560" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="620" y1="805" x2="620" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+
+    <!-- Thalamus  x=460, w=340, centre=630. Neurons A=500, B=560, C=620 -->
+    <rect x="460" y="870" width="340" height="135" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="630" y="896" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">Thalamus</text>
+    <text x="500" y="925" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">A</text>
+    <text x="560" y="925" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">B</text>
+    <text x="620" y="925" text-anchor="middle" font-size="20" font-weight="bold" fill="#2255aa">C</text>
+    <text x="590" y="988" text-anchor="middle" font-size="24" font-style="italic" font-weight="bold" fill="#2255aa">Winning neuron: B</text>
+    <circle cx="500" cy="940" r="9"  fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+    <circle cx="560" cy="940" r="12" fill="#337ef5" stroke="#1a4487" stroke-width="2.5"/>
+    <circle cx="620" cy="940" r="9"  fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+
+    <!-- Thalamus → Task box feedback -->
+    <polyline points="560,1010 560,1030 131,1030 131,615"
+              stroke="#111" stroke-width="2.2" fill="none" marker-end="url(#ah-blk)" stroke-dasharray="10,4"/>
+    <text x="340" y="1020" text-anchor="middle" font-size="24" fill="#333" font-weight="bold" font-style="italic">Chosen card: B</text>
+
+    <!-- Legend -->
+    <line x1="140" y1="1075" x2="204" y2="1075" stroke="#1a7a1a" stroke-width="3"/>
+    <polygon points="199,1069 210,1075 199,1081" fill="#1a7a1a"/>
+    <text x="220" y="1081" font-size="28" font-weight="bold" fill="#1a7a1a">Excitatory</text>
+    <line x1="420" y1="1075" x2="484" y2="1075" stroke="#c0392b" stroke-width="3"/>
+    <polygon points="479,1069 490,1075 479,1081" fill="#c0392b"/>
+    <text x="500" y="1081" font-size="28" font-weight="bold" fill="#c0392b">Inhibitory</text>
+    <line x1="690" y1="1075" x2="754" y2="1075" stroke="#7030a0" stroke-width="3" stroke-dasharray="8,4"/>
+    <polygon points="749,1069 760,1075 749,1081" fill="#7030a0"/>
+    <text x="770" y="1081" font-size="28" font-weight="bold" fill="#7030a0">Dopaminergic</text>
+
+  </g>
+  <!-- END (a) BG ════════════════════════════════════════════════ -->
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (b)  DBS BIPHASIC PULSE  +  PARAMETER LEGEND
+       Occupies right-top-LEFT: x=1090..1728, y=0..558
+
+       Waveform internal coordinates (original viewBox ~710×480):
+         - We use internal x from 55..650, y from 32..460
+         - Scale 0.68 → rendered width = 650×0.68 = 442px, height = 460×0.68 = 313px
+         - translate(1098, 58): waveform fits within x=1098..1540, y=58..371
+       Parameter legend block:
+         - Internal width 260, scale 0.86 → rendered 224px
+         - translate(1098+442+10=1550, 58)  → x=1550..1774  ← fits within 1728 if we shrink
+         - Actually translate(1098, 62) for waveform, translate(1500, 62) for params
+         - Params block: 260×420 @ scale 0.82 → 213×344px, placed at x=1506..1719
+       PULSE_TX=1098  PULSE_TY=62  PULSE_S=0.68
+       PARAM_TX=1506  PARAM_TY=62  PARAM_S=0.82
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="1350" y="10" font-size="35" font-weight="bold" fill="#111">(b) DBS Biphasic Pulse</text>
+
+  <!-- Waveform: internal coordinates kept as-is, scaled to 0.68 -->
+  <g transform="translate(1290,57) scale(0.95)">
+
+    <!-- AXES -->
+    <line x1="78" y1="42" x2="78" y2="415" stroke="#111" stroke-width="4"/>
+    <!-- <polygon points="73,44 78,32 83,44" fill="#111"/> -->
+    <line x1="78" y1="230" x2="650" y2="230" stroke="#111" stroke-width="4"/>
+    <!-- <polygon points="638,225 648,230 638,235" fill="#111"/> -->
+
+    <!-- Axis labels -->
+    <text x="52" y="38"  font-size="40" font-style="italic" fill="#111" text-anchor="middle" font-weight="bold">I</text>
+    <text x="656" y="237" font-size="40" font-style="italic" fill="#111" font-weight="bold">t</text>
+    <text x="55"  y="237" font-size="30" fill="#444" text-anchor="middle" font-weight="bold">0</text>
+
+    <!-- ±A ticks + labels -->
+    <line x1="70" y1="110" x2="86" y2="110" stroke="#111" stroke-width="2.2"/>
+    <line x1="70" y1="350" x2="86" y2="350" stroke="#111" stroke-width="2.2"/>
+    <text x="48" y="117" font-size="30" font-style="italic" fill="#c02000" text-anchor="middle" font-weight="bold">A</text>
+    <text x="40" y="358" font-size="30" font-style="italic" fill="#1040b0" text-anchor="middle" font-weight="bold">−A</text>
+
+    <!-- Dashed guide lines -->
+    <!-- <line x1="78" y1="110" x2="600" y2="110" stroke="#c02000" stroke-width="1.0" stroke-dasharray="6,5"/> -->
+    <!-- <line x1="78" y1="350" x2="600" y2="350" stroke="#1040b0" stroke-width="1.0" stroke-dasharray="6,5"/> -->
+
+    <!-- Leading zero segment -->
+    <line x1="78" y1="230" x2="90" y2="230" stroke="#111" stroke-width="2.8"/>
+
+    <!-- Period 1  xs=90 -->
+    <rect x="90"  y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+    <rect x="160" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+    <polyline points="90,230 90,110 128,110 128,230 160,230 160,350 198,350 198,230"
+              stroke="#111" stroke-width="3.5" fill="none"/>
+    <line x1="198" y1="230" x2="290" y2="230" stroke="#111" stroke-width="3.5"/>
+
+    <!-- Period 2  xs=290 -->
+    <rect x="290" y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+    <rect x="360" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+    <polyline points="290,230 290,110 328,110 328,230 360,230 360,350 398,350 398,230"
+              stroke="#111" stroke-width="3.5" fill="none"/>
+    <line x1="398" y1="230" x2="490" y2="230" stroke="#111" stroke-width="3.5"/>
+
+    <!-- Period 3  xs=490 -->
+    <rect x="490" y="110" width="38" height="120" fill="#c02000" opacity="0.16"/>
+    <rect x="560" y="230" width="38" height="120" fill="#1040b0" opacity="0.16"/>
+    <polyline points="490,230 490,110 528,110 528,230 560,230 560,350 598,350 598,230"
+              stroke="#111" stroke-width="3.5" fill="none"/>
+    <line x1="598" y1="230" x2="648" y2="230" stroke="#111" stroke-width="3.5"/>
+
+    <!-- τ annotation (below axis) -->
+    <line x1="90"  y1="230" x2="90"  y2="435" stroke="#222" stroke-width="4" stroke-dasharray="5,3"/>
+    <line x1="128" y1="230" x2="128" y2="435" stroke="#222" stroke-width="4" stroke-dasharray="5,3"/>
+    <line x1="90"  y1="420" x2="128" y2="420" stroke="#222" stroke-width="4"/>
+    <polygon points="98,416 87,420 98,424" fill="#444"/>
+    <polygon points="120,416 131,420 120,424" fill="#444"/>
+    <text x="109" y="452" text-anchor="middle" font-size="30" font-style="italic" font-weight="bold" fill="#222">τ</text>
+
+    <!-- Δ annotation -->
+    <line x1="160" y1="230" x2="160" y2="435" stroke="#222" stroke-width="4" stroke-dasharray="5,3"/>
+    <line x1="128" y1="404" x2="160" y2="404" stroke="#222" stroke-width="4"/>
+    <polygon points="138,400 127,404 138,408" fill="#222"/>
+    <polygon points="151,400 162,404 151,408" fill="#222"/>
+    <text x="144" y="393" text-anchor="middle" font-size="30" font-style="italic" font-weight="bold" fill="#222">Δ</text>
+
+    <!-- T annotation (above) -->
+    <line x1="90"  y1="70" x2="290" y2="70" stroke="#222" stroke-width="4"/>
+    <polygon points="100,66 89,70 100,74" fill="#222"/>
+    <polygon points="280,66 291,70 280,74" fill="#222"/>
+    <line x1="90"  y1="70" x2="90"  y2="110" stroke="#222" stroke-width="4" stroke-dasharray="3,3"/>
+    <line x1="290" y1="70" x2="290" y2="110" stroke="#222" stroke-width="4" stroke-dasharray="3,3"/>
+    <text x="190" y="58" text-anchor="middle" font-size="30" font-style="italic" font-weight="bold" fill="#222">T</text>
+
+  </g>
+  <!-- END waveform -->
+
+  <!-- Parameter legend block
+       Internal coords: rect at x=8,y=30 w=258 h=422
+       scale=0.82 → rendered: 8+258=266 * 0.82 = 218px wide
+       Placed at translate(1560, 62) → right edge = 1560+218=1778, within 1728 ✓ -->
+  <g transform="translate(1560,62) scale(0.0)">
+    <rect x="8" y="30" width="258" height="422" rx="10"
+          fill="#f5f5f2" stroke="#bbb" stroke-width="1.2"/>
+    <text x="133" y="60" text-anchor="middle" font-size="26"
+          fill="#222" font-weight="bold" letter-spacing="1.5">PARAMETERS</text>
+    <line x1="22" y1="70" x2="244" y2="70" stroke="#bbb" stroke-width="1"/>
+
+    <!-- A -->
+    <text x="34"  y="104" font-size="24" font-style="italic" fill="#c02000" font-weight="bold">A</text>
+    <text x="62"  y="104" font-size="24" fill="#222" font-weight="bold">Amplitude</text>
+    <!-- <text x="62"  y="124" font-size="14" fill="#555">Peak current  [mA / μA]</text> -->
+    <line x1="22" y1="134" x2="244" y2="134" stroke="#ddd" stroke-width="0.8"/>
+    <!-- τ -->
+    <text x="34"  y="158" font-size="23" font-style="italic" fill="#333">τ</text>
+    <text x="62"  y="158" font-size="17" fill="#222" font-weight="bold">Pulse width</text>
+    <text x="62"  y="178" font-size="14" fill="#555">Duration per phase  [μs]</text>
+    <line x1="22" y1="188" x2="244" y2="188" stroke="#ddd" stroke-width="0.8"/>
+    <!-- Δ -->
+    <text x="34"  y="212" font-size="23" font-style="italic" fill="#555">Δ</text>
+    <text x="62"  y="212" font-size="17" fill="#222" font-weight="bold">Inter-phase gap</text>
+    <text x="62"  y="232" font-size="14" fill="#555">Between phases  [μs]</text>
+    <line x1="22" y1="242" x2="244" y2="242" stroke="#ddd" stroke-width="0.8"/>
+    <!-- T -->
+    <text x="34"  y="266" font-size="23" font-style="italic" fill="#111" font-weight="bold">T</text>
+    <text x="62"  y="266" font-size="17" fill="#222" font-weight="bold">Period</text>
+    <text x="62"  y="286" font-size="14" fill="#555">Time per cycle  [ms]</text>
+    <line x1="22" y1="296" x2="244" y2="296" stroke="#ddd" stroke-width="0.8"/>
+    <!-- f -->
+    <text x="34"  y="320" font-size="23" font-style="italic" fill="#333">f</text>
+    <text x="62"  y="320" font-size="17" fill="#222" font-weight="bold">Frequency</text>
+    <text x="62"  y="340" font-size="14" fill="#555" font-style="italic">f = 1 / T    [Hz]</text>
+    <line x1="22" y1="350" x2="244" y2="350" stroke="#ddd" stroke-width="0.8"/>
+    <!-- D -->
+    <text x="34"  y="374" font-size="23" font-style="italic" fill="#333" font-weight="bold">D</text>
+    <text x="62"  y="374" font-size="17" fill="#222" font-weight="bold">Duty cycle</text>
+    <text x="62"  y="394" font-size="14" fill="#555" font-style="italic">D = τ / T    [0 – 1]</text>
+    <line x1="22" y1="404" x2="244" y2="404" stroke="#ddd" stroke-width="0.8"/>
+    <!-- Note -->
+    <text x="133" y="422" text-anchor="middle" font-size="13" fill="#777">Charge balance:  A · τ = const.</text>
+    <text x="133" y="441" text-anchor="middle" font-size="13" fill="#777">|q₁| = |q₂|  per phase</text>
+  </g>
+  <!-- END (b) ════════════════════════════════════════════════════ -->
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       (c)  sDBS  —  Gaussian Spread
+       Occupies right-top-RIGHT: x=1738..2390, y=0..558
+       Available width = 652px, available height = 558px
+
+       Internal layout (at scale=1.0):
+         - grid:     x=80..336  (256px), y=48..304  (256px)
+         - j-axis label: y=326
+         - i-axis label: x=30 rotated
+         - colorbar: x=352..370 (18px wide), y=48..304
+         - colorbar labels (1, 0.5, 0): x=380 (to the right of bar)
+         - w(i,j) label: x=396 rotated
+
+       Total internal width used: ~410px, height ~340px
+       Scale 1.18 → rendered 484px wide, 401px tall
+       Fits in 652px ✓
+       SDBS_TX=1850  SDBS_TY=62  SDBS_S=1.3
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="2000" y="10" font-size="35" font-weight="bold" fill="#111">(c) Standard DBS (sDBS)</text>
+
+  <g transform="translate(1930,62) scale(1.275)">
+
+    <g id="sdbs-grid"></g>
+
+    <!-- Grid border (on top of cells) -->
+    <rect x="80" y="48" width="256" height="256" fill="none" stroke="#333" stroke-width="2.5"/>
+
+    <!-- Electrode needle, tip near cell (7,7) ≈ pixel (80+7×16, 48+7×16) = (192,160) -->
+    <polygon points="178,0 186,0 184,150 182,160 181,151"
+             fill="#666" stroke="#333" stroke-width="1"
+             transform="rotate(12,182,160)"/>
+    <rect x="175" y="0" width="14" height="10" rx="3"
+          fill="#888" stroke="#333" stroke-width="1"
+          transform="rotate(12,182,160)"/>
+    <circle cx="182" cy="160" r="3.5" fill="#111" stroke="#333" stroke-width="1"
+            transform="rotate(12,182,160)"/>
+
+
+    <!-- (cx,cy) label — positioned to the right of tip, inside grid -->
+    <text x="196" y="176" font-size="28" font-weight="bold" fill="#111" font-style="italic">
+      <tspan>(c</tspan><tspan baseline-shift="sub" font-size="20">x</tspan>
+      <tspan>, c</tspan><tspan baseline-shift="sub" font-size="20">y</tspan><tspan>)</tspan>
+    </text>
+
+    <!-- j → axis label (below grid) -->
+    <text x="208" y="330" text-anchor="middle" font-size="26" fill="#111" font-style="italic" font-weight="bold">j →</text>
+
+    <!-- i → axis label (left of grid, rotated) -->
+    <text x="40" y="206" text-anchor="middle" font-size="26" fill="#111" font-style="italic" font-weight="bold"
+          transform="rotate(-90,30,176)">i →</text>
+
+    <!-- Colour bar — x=352..370, y=48..304 (right of grid with gap) -->
+    <rect x="352" y="48" width="18" height="256" fill="url(#cbar)" stroke="#555" stroke-width="1.2"/>
+
+    <!-- Colour bar tick labels — x=374 (right of bar), clearly outside -->
+    <text x="374" y="52"  text-anchor="start" font-size="22" fill="#111" font-weight="bold">1</text>
+    <text x="374" y="176" text-anchor="start" font-size="22" fill="#111" font-weight="bold">0.5</text>
+    <text x="374" y="306" text-anchor="start" font-size="22" fill="#111" font-weight="bold">0</text>
+
+    <!-- w(i,j) rotated label — further right of tick labels -->
+    <text x="412" y="166" text-anchor="middle" font-size="26" fill="#111" font-weight="bold"
+          transform="rotate(90,412,176)">w(i,j)</text>
+
+  </g>
+  <!-- ════════════════════════════════════════════════════════════
+       (d)  rDBS
+       GRID BLOCK:  GX=0   GY=0   GS=1.05  ← change all 3 to move/scale grids
+       CLOCK:       CK_OX=760  CK_OY=295  CK_S=1.75  ← change to move/scale clock
+       
+       At GS=1.05: grid=208px scaled, gap=55px unscaled between rows
+       Top grid bottom (unscaled) = 263. Gap = 55. Bottom grid top = 318.
+       Gap block (55px) stacks: title(12) + 4 + degree(10) + 4 + t-label(10) + gap(15) = 55 ✓
+  ════════════════════════════════════════════════════════════════ -->
+  <text x="1350" y="650" font-size="35" font-weight="bold" fill="#111">(d) Rotational DBS (rDBS)</text>
+
+  <g transform="translate(1400, 654)">
+
+    <!-- ╔══════════════════════════════════════════════╗
+         ║  GRID BLOCK — change GS to scale all 4 grids ║
+         ║  GX=0  GY=0  GS=1.05                         ║
+         ╚══════════════════════════════════════════════╝ -->
+    <g transform="translate(470, 50) scale(1.35)">   <!-- GX=0  GY=0  GS=1.05 -->
+
+      <g id="rdbs-grids"></g>
+
+      <!-- TOP ROW LABELS (above y=55) -->
+      <text x="114" y="11" text-anchor="middle" font-size="25" font-weight="bold" fill="#111">Sector-2</text>
+      <text x="332" y="11" text-anchor="middle" font-size="25" font-weight="bold" fill="#111">Sector-1</text>
+
+      <!-- GAP BLOCK between rows (top grid bottom=263, bottom grid top=318, gap=55px)
+           Line 1 — bottom sector titles:  y = 263 + 14 = 277
+           Line 2 — degree labels:         y = 277 + 19 = 296
+           Line 3 — t-interval labels:     y = 296 + 18 = 314  (bottom grid starts 318 ✓) -->
+      <text x="114" y="337" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Sector-3</text>
+      <text x="332" y="337" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Sector-4</text>
+
+      <text x="114" y="266" text-anchor="middle" font-size="23" font-weight="bold" fill="#7030a0">90° – 180°</text>
+      <text x="332" y="266" text-anchor="middle" font-size="23" font-weight="bold" fill="#2255aa">0° – 90°</text>
+
+      <text x="114" y="294" text-anchor="middle" font-size="23" font-weight="bold" fill="#333">t ∈ [T<tspan baseline-shift="sub" font-size="16">s</tspan>, 2T<tspan baseline-shift="sub" font-size="16">s</tspan>)</text>
+      <text x="332" y="294" text-anchor="middle" font-size="23" font-weight="bold" fill="#333">t ∈ [0, T<tspan baseline-shift="sub" font-size="16">s</tspan>)</text>
+      
+      <!-- BELOW BOTTOM ROW (bottom grid bottom=526) -->
+      <text x="114" y="592" text-anchor="middle" font-size="23" font-weight="bold" fill="#cc5500">180° – 270°</text>
+      <text x="332" y="592" text-anchor="middle" font-size="23" font-weight="bold" fill="#1a6e1a">270° – 360°</text>
+
+      <text x="114" y="622" text-anchor="middle" font-size="23" font-weight="bold" fill="#333">t ∈ [2T<tspan baseline-shift="sub" font-size="16">s</tspan>, 3T<tspan baseline-shift="sub" font-size="16">s</tspan>)</text>
+      <text x="332" y="622" text-anchor="middle" font-size="23" font-weight="bold" fill="#333">t ∈ [3T<tspan baseline-shift="sub" font-size="16">s</tspan>, 4T<tspan baseline-shift="sub" font-size="16">s</tspan>)</text>
+
+    </g>
+    <!-- END GRID BLOCK -->
+
+    <!-- ╔══════════════════════════════════════════════╗
+         ║  CLOCK — translate(CK_OX, CK_OY) scale(CK_S) ║
+         ║  CK_OX=760  CK_OY=295  CK_S=1.75             ║
+         ╚══════════════════════════════════════════════╝ -->
+    <g transform="translate(170, 415) scale(2.0)">
+
+      <!-- Sector-2: top-left, purple (90°–180°) -->
+      <path d="M 0,0 L -100,0 A 100,100 0 0,1 0,-100 Z" fill="#f0e0ff" stroke="#7030a0" stroke-width="2"/>
+      <!-- Sector-3: bottom-left, orange (180°–270°) -->
+      <path d="M 0,0 L 0,100  A 100,100 0 0,1 -100,0 Z" fill="#fde8cc" stroke="#cc5500" stroke-width="2"/>
+      <!-- Sector-4: bottom-right, green (270°–360°) -->
+      <path d="M 0,0 L 100,0  A 100,100 0 0,1 0,100  Z" fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2"/>
+      <!-- Sector-1: top-right, blue (0°–90°) -->
+      <path d="M 0,0 L 0,-100 A 100,100 0 0,1 100,0  Z" fill="#ddeeff" stroke="#2255aa" stroke-width="2"/>
+
+      <!-- Spokes -->
+      <line x1="0" y1="0" x2="0"    y2="-100" stroke="#555" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="0" y1="0" x2="100"  y2="0"    stroke="#555" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="0" y1="0" x2="0"    y2="100"  stroke="#555" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="0" y1="0" x2="-100" y2="0"    stroke="#555" stroke-width="1.2" stroke-dasharray="4,3"/>
+
+      <g id="el-0"></g>
+      <g id="el-1"></g>
+      <g id="el-2"></g>
+      <g id="el-3"></g>
+
+
+
+      <!-- Degree labels -->
+      <text x="0"    y="-118" text-anchor="middle" font-size="16" fill="#111" font-weight="bold">90°</text>
+      <text x="114"  y="5"    text-anchor="start"  font-size="16" fill="#111" font-weight="bold">0°</text>
+      <text x="0"    y="118"  text-anchor="middle" font-size="16" fill="#111" font-weight="bold">270°</text>
+      <text x="-114" y="5"    text-anchor="end"    font-size="16" fill="#111" font-weight="bold">180°</text>
+
+      <!-- Sector labels -->
+      <text x="50"  y="-52" text-anchor="middle" font-size="18" font-weight="bold" fill="#2255aa">S-1</text>
+      <text x="50"  y="-33" text-anchor="middle" font-size="13"                    fill="#2255aa">0°–90°</text>
+      <text x="-50" y="-52" text-anchor="middle" font-size="18" font-weight="bold" fill="#7030a0">S-2</text>
+      <text x="-50" y="-33" text-anchor="middle" font-size="13"                    fill="#7030a0">90°–180°</text>
+      <text x="-50" y="44"  text-anchor="middle" font-size="18" font-weight="bold" fill="#cc5500">S-3</text>
+      <text x="-50" y="63"  text-anchor="middle" font-size="13"                    fill="#cc5500">180°–270°</text>
+      <text x="50"  y="44"  text-anchor="middle" font-size="18" font-weight="bold" fill="#1a6e1a">S-4</text>
+      <text x="50"  y="63"  text-anchor="middle" font-size="13"                    fill="#1a6e1a">270°–360°</text>
+
+      <!-- Centre dot + label -->
+      <circle cx="0" cy="0" r="5" fill="#111" stroke="#fff" stroke-width="1.5"/>
+      <text x="10" y="17" font-size="13" fill="#333" font-style="italic">
+        (c<tspan baseline-shift="sub" font-size="10">x</tspan>, c<tspan baseline-shift="sub" font-size="10">y</tspan>)
+      </text>
+
+      <!-- CCW rotation arrow -->
+      <path d="M 90,-61 A 100,100 0 0,0 -90,61" fill="none" stroke="#333" stroke-width="2.2"/>
+      <polygon points="-93,65 -83,69 -86,57" fill="#333"/>
+
+      <!-- f_rot label -->
+      <text x="-96" y="70" text-anchor="end" font-size="17" fill="#333" font-style="italic">f<tspan baseline-shift="sub" font-size="12">rot</tspan></text>
+
+      <!-- f_rot equation below clock -->
+      <text x="0" y="170" text-anchor="middle" font-size="17" fill="#333" font-style="italic" font-weight="bold">
+        f<tspan baseline-shift="sub" font-size="12">rot</tspan>
+        <tspan> = 5 Hz,  T</tspan><tspan baseline-shift="sub" font-size="12">s</tspan>
+        <tspan> = 50 ms</tspan>
+      </text>
+
+    </g>
+    <!-- END CLOCK -->
+
+  </g>
+  <!-- END (d) rDBS ════════════════════════════════════════════════ -->
+
+</svg>
+
+<script>
+
+(function(){
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // ── (c) sDBS grid ─────────────────────────────────────────────
+  const sN=16, sCell=16, sox=80, soy=48, sc=7, sSigma=3.25;
+  const sGrid = document.getElementById('sdbs-grid');
+  for(let i=0;i<sN;i++){
+    for(let j=0;j<sN;j++){
+      const w = Math.exp(-((i-sc)**2+(j-sc)**2)/(2*sSigma**2));
+      const r = Math.round(255-(255-204)*w);
+      const g = Math.round(255-(255-34)*w);
+      const b = Math.round(255-255*w);
+      const rect = document.createElementNS(ns,'rect');
+      rect.setAttribute('x', sox + j*sCell);
+      rect.setAttribute('y', soy + i*sCell);
+      rect.setAttribute('width',  sCell);
+      rect.setAttribute('height', sCell);
+      rect.setAttribute('fill',   `rgb(${r},${g},${b})`);
+      rect.setAttribute('stroke', '#ccc');
+      rect.setAttribute('stroke-width','0.4');
+      sGrid.appendChild(rect);
+    }
+  }
+
+  // ── (d) rDBS grids ─────────────────────────────────────────────
+  // rCell=13, grid=208px, gap=55px
+  // Top row y=55..263, bottom row y=338..546
+  const rN=16, rCell=13, half=rN/2;
+  const gridOrigins = [
+    {x:10,  y:25 },   // Sector-2: top-left,    purple
+    {x:248, y:25 },   // Sector-1: top-right,   blue
+    {x:10,  y:350},   // Sector-3: bottom-left, orange
+    {x:248, y:350}    // Sector-4: bottom-right, green
+  ];
+  const sectorQuads = [
+    {rMin:0, rMax:8,  cMin:0, cMax:8 },   // Sector-2: top-left active
+    {rMin:0, rMax:8,  cMin:8, cMax:16},   // Sector-1: top-right active
+    {rMin:8, rMax:16, cMin:0, cMax:8 },   // Sector-3: bottom-left active
+    {rMin:8, rMax:16, cMin:8, cMax:16}    // Sector-4: bottom-right active
+  ];
+  const activeColors = ['#7030a0','#2255aa','#cc5500','#1a6e1a'];
+  const hexBase = {
+    '#2255aa':[34,85,170],
+    '#7030a0':[112,48,160],
+    '#cc5500':[204,85,0],
+    '#1a6e1a':[26,110,26]
+  };
+  const rGrids = document.getElementById('rdbs-grids');
+  const c_idx=7, rSigma=3.25;
+
+  gridOrigins.forEach((origin, sIdx) => {
+    const quad = sectorQuads[sIdx];
+    const col  = activeColors[sIdx];
+    for(let i=0;i<rN;i++){
+      for(let j=0;j<rN;j++){
+        const isActive = i>=quad.rMin && i<quad.rMax && j>=quad.cMin && j<quad.cMax;
+        let fill;
+        if(isActive){
+          const w = Math.exp(-((i-c_idx)**2+(j-c_idx)**2)/(2*rSigma**2));
+          const [r0,g0,b0] = hexBase[col];
+          fill = `rgb(${Math.round(255-(255-r0)*w)},${Math.round(255-(255-g0)*w)},${Math.round(255-(255-b0)*w)})`;
+        } else { fill = '#f0f0f0'; }
+        const rect = document.createElementNS(ns,'rect');
+        rect.setAttribute('x', origin.x + j*rCell);
+        rect.setAttribute('y', origin.y + i*rCell);
+        rect.setAttribute('width',  rCell);
+        rect.setAttribute('height', rCell);
+        rect.setAttribute('fill',   fill);
+        rect.setAttribute('stroke', '#ccc');
+        rect.setAttribute('stroke-width','0.3');
+        rGrids.appendChild(rect);
+      }
+    }
+    const border = document.createElementNS(ns,'rect');
+    border.setAttribute('x', origin.x); border.setAttribute('y', origin.y);
+    border.setAttribute('width', rN*rCell); border.setAttribute('height', rN*rCell);
+    border.setAttribute('fill','none'); border.setAttribute('stroke', col);
+    border.setAttribute('stroke-width','2.5');
+    rGrids.appendChild(border);
+    const mid = half*rCell;
+    const vl = document.createElementNS(ns,'line');
+    vl.setAttribute('x1',origin.x+mid); vl.setAttribute('y1',origin.y);
+    vl.setAttribute('x2',origin.x+mid); vl.setAttribute('y2',origin.y+rN*rCell);
+    vl.setAttribute('stroke','#999'); vl.setAttribute('stroke-width','1');
+    rGrids.appendChild(vl);
+    const hl = document.createElementNS(ns,'line');
+    hl.setAttribute('x1',origin.x);          hl.setAttribute('y1',origin.y+mid);
+    hl.setAttribute('x2',origin.x+rN*rCell); hl.setAttribute('y2',origin.y+mid);
+    hl.setAttribute('stroke','#999'); hl.setAttribute('stroke-width','1');
+    rGrids.appendChild(hl);
+    const hi = document.createElementNS(ns,'rect');
+    hi.setAttribute('x', origin.x + quad.cMin*rCell);
+    hi.setAttribute('y', origin.y + quad.rMin*rCell);
+    hi.setAttribute('width',  (quad.cMax-quad.cMin)*rCell);
+    hi.setAttribute('height', (quad.rMax-quad.rMin)*rCell);
+    hi.setAttribute('fill','none'); hi.setAttribute('stroke', col);
+    hi.setAttribute('stroke-width','3');
+    rGrids.appendChild(hi);
+  });
+// ══════════════════════════════════════════════
+  // ELECTRODES — add/edit rows here only
+ const EL_LENGTH_DEFAULT = 60;
+  const EL_ANGLE_DEFAULT  = 25;
+
+  const electrodes = [
+    { cx: 227, cy: 128 },                        // electrode 0 — length 60, angle 25
+    { cx: 390, cy: 120 },                        // electrode 1 — length 60, angle 25
+    { cx: 227, cy: -100 },                       // electrode 2 — length 60, angle 25
+    { cx: 390, cy: -100 },                       // electrode 3 — length 60, angle 25
+    { cx: 200, cy: 200, length: 80, angle: 1 }   // electrode 4 — length 80, angle 1
+  ];
+
+  electrodes.forEach((el, idx) => {
+    const g      = document.getElementById(`el-${idx}`);
+    const len    = el.length ?? EL_LENGTH_DEFAULT;  // use own or default
+    const angle  = el.angle  ?? EL_ANGLE_DEFAULT;
+    const top    = el.cy - len;
+    const rot    = `rotate(${angle},${el.cx},${el.cy})`;
+
+    const shaft = document.createElementNS(ns, 'polygon');
+    shaft.setAttribute('points',
+      `${el.cx-2},${top} ${el.cx+2},${top} ${el.cx+1},${el.cy-8} ${el.cx},${el.cy} ${el.cx-1},${el.cy-8}`);
+    shaft.setAttribute('fill','#666');
+    shaft.setAttribute('stroke','#333');
+    shaft.setAttribute('stroke-width','1');
+    shaft.setAttribute('transform', rot);
+
+    const cap = document.createElementNS(ns, 'rect');
+    cap.setAttribute('x',      el.cx - 3);
+    cap.setAttribute('y',      top);
+    cap.setAttribute('width',  6);
+    cap.setAttribute('height', 8);
+    cap.setAttribute('rx',     2);
+    cap.setAttribute('fill',  '#888');
+    cap.setAttribute('stroke','#333');
+    cap.setAttribute('stroke-width','1');
+    cap.setAttribute('transform', rot);
+
+    const tip = document.createElementNS(ns, 'circle');
+    tip.setAttribute('cx', el.cx);
+    tip.setAttribute('cy', el.cy);
+    tip.setAttribute('r',  2.5);
+    tip.setAttribute('fill',  '#111');
+    tip.setAttribute('stroke','#333');
+    tip.setAttribute('stroke-width','1');
+    tip.setAttribute('transform', rot);
+
+    g.appendChild(shaft);
+    g.appendChild(cap);
+    g.appendChild(tip);
+  });
+})();   // ← this is your existing closing line, don't add another
+// })();
+</script>
+
+
+</body>
+</html>

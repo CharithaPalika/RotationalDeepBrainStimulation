@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; padding: 30px; }
+</style>
+</head>
+<body>
+<!--
+  KEY GEOMETRY:
+  Cortex:  x=390, y=30,  w=340, h=72  centre=560  (wider to cover D1+D2)
+  Cortex neurons: x=470, 560, 650  y=80 (3 neurons, A/B/C from above)
+  Input arrows A/B/C: from y=0 down into cortex neurons at y=68
+
+  D1: x=390, y=165, w=165, h=80  neurons at x=430,470,510  (spaced 40px)
+  D2: x=565, y=165, w=165, h=80  neurons at x=605,645,685  (spaced 40px)
+
+  GPi: x=390, y=615, w=340, h=65  neurons aligned to D1: 430,470,510
+  Thal: x=390, y=760, w=340, h=65  neurons aligned to D1: 430,470,510
+
+  Q-value elbow: from D1 left edge (390,190) left to x=310, down to SNc
+  Cortex→Striatum: 3 lines from cortex neurons down to striatum neurons
+    cortex-A(470) → D1-A(430)  diagonal
+    cortex-B(560) → D1-B(470)  diagonal  (also → D2-B(645) ? No, one line down from cortex to the split)
+    Actually: cortex centre → down to x-split between D1/D2
+    Simplest: single arrow from cortex bottom centre to y=163 (top of striatum row)
+
+  D2→GPe: from D2 right edge (730,200) → right to GPe left (760,200)
+-->
+
+<svg viewBox="0 0 1100 1050" width="1100" height="1050"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="ah-blk" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#111"/>
+    </marker>
+    <marker id="ah-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#c0392b"/>
+    </marker>
+    <marker id="ah-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#1a7a1a"/>
+    </marker>
+    <marker id="ah-pur" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#7030a0"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="1050" fill="#ffffff"/>
+
+  <!-- ═══════════════════════════════════
+       DECISION MAKING TASK BOX  (unchanged)
+       ═══════════════════════════════════ -->
+  <!-- <rect x="1" y="265" width="170" height="205" rx="8"
+        fill="#f9f9f9" stroke="#444" stroke-width="2.2"/>
+  <text x="85" y="290" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Decision Making</text>
+  <text x="85" y="308" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Task</text> -->
+  <!-- Cards -->
+  <!-- <rect x="8"   y="318" width="44" height="56" rx="5" fill="#fff" stroke="#555" stroke-width="1.8"/>
+  <text x="30"  y="352" text-anchor="middle" font-size="19" font-weight="bold" fill="#333">A</text>
+  <rect x="63"  y="318" width="44" height="56" rx="5" fill="#abcef5" stroke="#555" stroke-width="1.8"/>
+  <text x="85"  y="352" text-anchor="middle" font-size="19" font-weight="bold" fill="#333">B</text>
+  <rect x="118" y="318" width="44" height="56" rx="5" fill="#fff" stroke="#555" stroke-width="1.8"/>
+  <text x="140" y="352" text-anchor="middle" font-size="19" font-weight="bold" fill="#333">C</text> -->
+  <!-- Reward -->
+  <!-- <text x="85" y="402" text-anchor="middle" font-size="14" fill="#666" font-style="italic">Reward</text>
+  <text x="85" y="430" text-anchor="middle" font-size="26" font-weight="bold" fill="#222">R</text>
+  <text x="85" y="445" text-anchor="middle" font-size="12" fill="#999">(chosen card: B)</text>
+  <text x="85" y="460" text-anchor="middle" font-size="12" fill="#999">(Eg: B)</text> -->
+
+  <!-- ═══════════════════════════════════
+     DECISION MAKING TASK BOX
+     ═══════════════════════════════════ -->
+<rect x="1" y="265" width="195" height="285" rx="8"
+      fill="#f9f9f9" stroke="#444" stroke-width="2.2"/>
+<text x="95" y="290" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Decision Making</text>
+<text x="95" y="308" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Task</text>
+
+<!-- Plot axes — y=335..403 -->
+<line x1="20" y1="403" x2="188" y2="403" stroke="#555" stroke-width="1.2"/>
+<line x1="20" y1="335" x2="20"  y2="403" stroke="#555" stroke-width="1.2"/>
+<text x="104" y="414" text-anchor="middle" font-size="10" fill="#555" font-style="italic">Reward</text>
+<text x="12"  y="370" text-anchor="middle" font-size="10" fill="#555" font-style="italic"
+      transform="rotate(-90,12,370)">p(R)</text>
+
+<!-- Arm C: lowest μ, widest σ, grey -->
+<path d="M 18,403
+         C 18,403  28,403  38,386
+         C 48,369  50,363  55,361
+         C 60,363  62,369  72,386
+         C 82,403  92,403  92,403"
+      stroke="#888" stroke-width="1.5" fill="#88888818"/>
+<line x1="55" y1="362" x2="55" y2="403"
+      stroke="#888" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="55" y="357" text-anchor="middle" font-size="10" fill="#888" font-style="italic">μ_C</text>
+<text x="55" y="348" text-anchor="middle" font-size="10" font-weight="bold" fill="#888">C</text>
+
+<!-- Arm A: medium μ, medium σ, blue-grey -->
+<path d="M 72,403
+         C 72,403  86,403  96,383
+         C 106,363 108,354 110,352
+         C 112,354 114,363 124,383
+         C 134,403 148,403 148,403"
+      stroke="#6699cc" stroke-width="1.5" fill="#6699cc18"/>
+<line x1="110" y1="353" x2="110" y2="403"
+      stroke="#6699cc" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="110" y="348" text-anchor="middle" font-size="10" fill="#6699cc" font-style="italic">μ_A</text>
+<text x="110" y="339" text-anchor="middle" font-size="10" font-weight="bold" fill="#6699cc">A</text>
+
+<!-- Arm B: highest μ, narrowest σ, tallest, filled blue (chosen) -->
+<path d="M 132,403
+         C 132,403 144,403 150,381
+         C 156,359 157,337 158,335
+         C 159,337 160,359 166,381
+         C 172,403 184,403 184,403"
+      stroke="#2255aa" stroke-width="2" fill="#2255aa44"/>
+<line x1="158" y1="336" x2="158" y2="403"
+      stroke="#2255aa" stroke-width="1.2" stroke-dasharray="3,2"/>
+<text x="158" y="333" text-anchor="middle" font-size="10" fill="#2255aa" font-style="italic">μ_B</text>
+<text x="160" y="323" text-anchor="middle" font-size="10" font-weight="bold" fill="#2255aa">B ★</text>
+
+<!-- Cards — shifted down 20px, now at y=425 -->
+<rect x="30"  y="435" width="44" height="56" rx="5" fill="#fff"    stroke="#555" stroke-width="1.8"/>
+<text x="52"  y="469" text-anchor="middle" font-size="19" font-weight="bold" fill="#333">A</text>
+<rect x="83"  y="435" width="44" height="56" rx="5" fill="#abcef5" stroke="#2255aa" stroke-width="2.5"/>
+<text x="105" y="469" text-anchor="middle" font-size="19" font-weight="bold" fill="#2255aa">B</text>
+<rect x="138" y="435" width="44" height="56" rx="5" fill="#fff"    stroke="#555" stroke-width="1.8"/>
+<text x="160" y="469" text-anchor="middle" font-size="19" font-weight="bold" fill="#333">C</text>
+
+<!-- Reward formula -->
+<text x="97" y="513" text-anchor="middle" font-size="13" fill="#222">
+  <tspan font-style="italic" font-weight="bold">R</tspan>
+  <tspan baseline-shift="sub" font-size="9">B</tspan>
+  <tspan dx="2">&#x007E;</tspan>
+  <tspan dx="2" font-style="italic">&#x1D4A9;</tspan>
+  <tspan dx="1">(</tspan>
+  <tspan font-style="italic">&#x03BC;</tspan>
+  <tspan baseline-shift="sub" font-size="9">B</tspan>
+  <tspan dx="1">,</tspan>
+  <tspan dx="3" font-style="italic">&#x03C3;</tspan>
+  <tspan baseline-shift="sub" font-size="9">B</tspan>
+  <tspan baseline-shift="super" font-size="9">2</tspan>
+  <tspan>)</tspan>
+</text>
+<text x="97" y="530" text-anchor="middle" font-size="11" fill="#999">(reward drawn from B)</text>
+  <!-- ═══════════════════════════════════
+       SNc ELLIPSE
+       ═══════════════════════════════════ -->
+  <ellipse cx="304" cy="600" rx="90" ry="55"
+           fill="#f3eafa" stroke="#7030a0" stroke-width="2.5"/>
+  <text x="300" y="600" text-anchor="middle" font-size="27" font-weight="bold" fill="#7030a0">SNc</text>
+  <text x="300" y="630" text-anchor="middle" font-size="20" font-style="italic" fill="#7030a0">&#948; = R &#8722; Q</text>
+
+  <!-- ═══════════════════════════════════
+       INPUT LABELS A, B, C → Cortex
+       Arrows from top, entering cortex neurons
+       Cortex neurons at x=470, 560, 650  y_top=28
+       ═══════════════════════════════════ -->
+  <!-- Input A -->
+  <text x="470" y="20" text-anchor="middle" font-size="25" font-weight="bold" fill="#2255aa">A</text>
+  <line x1="470" y1="24" x2="470" y2="97" stroke="#2255aa" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- Input B -->
+  <text x="560" y="20" text-anchor="middle" font-size="25" font-weight="bold" fill="#2255aa">B</text>
+  <line x1="560" y1="24" x2="560" y2="97" stroke="#2255aa" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- Input C -->
+  <text x="650" y="20" text-anchor="middle" font-size="25" font-weight="bold" fill="#2255aa">C</text>
+  <line x1="650" y1="24" x2="650" y2="97" stroke="#2255aa" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+
+  <!-- ═══════════════════════════════════
+       CORTEX  x=390, y=28, w=310, h=72
+       Neurons at x=470,560,650  y=68 (bottom row of cortex)
+       ═══════════════════════════════════ -->
+  <rect x="390" y="98" width="310" height="72" rx="8"
+        fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+  <text x="545" y="128" text-anchor="middle" font-size="28" font-weight="bold" fill="#2255aa">Cortex</text>
+  <!-- 3 cortex neurons -->
+  <circle cx="470" cy="148" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+  <circle cx="560" cy="148" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+  <circle cx="650" cy="148" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+  <!-- ═══════════════════════════════════
+       CORTEX NEURONS → STRIATUM NEURONS
+       Cortex-A(470) → D1-A(430) and D2-A(605)
+       Cortex-B(560) → D1-B(470) and D2-B(645)
+       Cortex-C(650) → D1-C(510) and D2-C(685)
+       Route: diagonal lines straight down
+       ═══════════════════════════════════ -->
+  <!-- cortex-A → D1-A -->
+  <line x1="466" y1="158" x2="432" y2="232"
+        stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- cortex-A → D2-A -->
+  <line x1="474" y1="158" x2="603" y2="232"
+        stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- cortex-B → D1-B -->
+  <line x1="556" y1="158" x2="472" y2="232"
+        stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- cortex-B → D2-B -->
+  <line x1="564" y1="158" x2="643" y2="232"
+        stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- cortex-C → D1-C -->
+  <line x1="646" y1="158" x2="512" y2="232"
+        stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+  <!-- cortex-C → D2-C -->
+  <line x1="654" y1="158" x2="683" y2="232"
+        stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+
+  <!-- ═══════════════════════════════════
+       D1  x=390, y=162, w=165, h=82
+       Neurons at x=430, 470, 510   y=210
+       ═══════════════════════════════════ -->
+  <rect x="390" y="232" width="165" height="82" rx="7"
+        fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+  <text x="472" y="254" text-anchor="middle" font-size="23" font-weight="bold" fill="#2255aa">D&#8321;</text>
+  <!-- A/B/C above neurons -->
+  <text x="430" y="270" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">A</text>
+  <text x="470" y="270" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">B</text>
+  <text x="510" y="270" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">C</text>
+  <!-- neurons -->
+  <circle cx="430" cy="288" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+  <circle cx="470" cy="288" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+  <circle cx="510" cy="288" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+  <!-- ═══════════════════════════════════
+       D2  x=565, y=162, w=165, h=82
+       Neurons at x=605, 645, 685   y=210
+       ═══════════════════════════════════ -->
+  <rect x="565" y="232" width="165" height="82" rx="7"
+        fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+  <text x="647" y="254" text-anchor="middle" font-size="23" font-weight="bold" fill="#2255aa">D&#8322;</text>
+  <!-- A/B/C above neurons -->
+  <text x="605" y="270" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">A</text>
+  <text x="645" y="270" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">B</text>
+  <text x="685" y="270" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">C</text>
+  <!-- neurons -->
+  <circle cx="605" cy="288" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+  <circle cx="645" cy="288" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+  <circle cx="685" cy="288" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+<!-- ═══════════════════════════════════
+     GPe  — 3 cluster sub-boxes
+     x=780, y=232, w=190, h=170
+     ═══════════════════════════════════ -->
+<rect x="780" y="232" width="190" height="170" rx="7"
+      fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+<text x="875" y="254" text-anchor="middle" font-size="25" font-weight="bold" fill="#c0392b">GPe</text>
+
+<!-- cluster 0 -->
+<rect x="788" y="260" width="48" height="129" rx="4"
+      fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+<text x="812" y="275" text-anchor="middle" font-size="13" fill="#c0392b" font-style="italic">c&#8320;</text>
+<circle cx="812" cy="293" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="812" cy="316" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="812" cy="339" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="812" cy="362" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+
+<!-- cluster 1 -->
+<rect x="846" y="260" width="48" height="129" rx="4"
+      fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+<text x="870" y="275" text-anchor="middle" font-size="13" fill="#c0392b" font-style="italic">c&#8321;</text>
+<circle cx="870" cy="293" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="870" cy="316" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="870" cy="339" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="870" cy="362" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+
+<!-- cluster 2 -->
+<rect x="904" y="260" width="48" height="129" rx="4"
+      fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+<text x="928" y="275" text-anchor="middle" font-size="13" fill="#c0392b" font-style="italic">c&#8322;</text>
+<circle cx="928" cy="293" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="928" cy="316" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="928" cy="339" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+<circle cx="928" cy="362" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+
+  <!-- ═══════════════════════════════════
+       STN — 3 cluster sub-boxes (unchanged)
+       ═══════════════════════════════════ -->
+  <rect x="780" y="455" width="200" height="170" rx="7"
+        fill="#f0fff0" stroke="#1a7a1a" stroke-width="2.5"/>
+  <text x="880" y="482" text-anchor="middle" font-size="25" font-weight="bold" fill="#1a7a1a">STN</text>
+  <!-- cluster 0 -->
+  <rect x="788" y="490" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+  <text x="814" y="506" text-anchor="middle" font-size="13" fill="#1a7a1a" font-style="italic">c&#8320;</text>
+  <circle cx="814" cy="522" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="814" cy="544" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="814" cy="566" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="814" cy="588" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <!-- cluster 1 -->
+  <rect x="850" y="490" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+  <text x="876" y="506" text-anchor="middle" font-size="13" fill="#1a7a1a" font-style="italic">c&#8321;</text>
+  <circle cx="876" cy="522" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="876" cy="544" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="876" cy="566" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="876" cy="588" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <!-- cluster 2 -->
+  <rect x="912" y="490" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+  <text x="938" y="506" text-anchor="middle" font-size="13" fill="#1a7a1a" font-style="italic">c&#8322;</text>
+  <circle cx="938" cy="522" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="938" cy="544" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="938" cy="566" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+  <circle cx="938" cy="588" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+
+  <!-- ═══════════════════════════════════
+       GPi  x=390, y=620, w=340, h=65
+       Neurons aligned to D1: x=430,470,510
+       ═══════════════════════════════════ -->
+  <rect x="390" y="690" width="340" height="65" rx="7"
+        fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+  <text x="560" y="718" text-anchor="middle" font-size="25" font-weight="bold" fill="#c0392b">GPi</text>
+  <circle cx="430" cy="732" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+  <circle cx="470" cy="732" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+  <circle cx="510" cy="732" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+
+  <!-- ═══════════════════════════════════
+       THALAMUS  x=390, y=768, w=340, h=65
+       Neurons at x=430,470,510
+       ═══════════════════════════════════ -->
+  <rect x="390" y="838" width="340" height="105" rx="7"
+        fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+  <text x="560" y="866" text-anchor="middle" font-size="25" font-weight="bold" fill="#2255aa">Thalamus</text>
+
+  <text x="430" y="884" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">A</text>
+  <text x="470" y="884" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">B</text>
+  <text x="510" y="884" text-anchor="middle" font-size="13" font-weight="bold" fill="#2255aa">C</text>
+
+  <text x="532" y="933" text-anchor="middle" font-size="14" font-style="italic" fill="#2255aa">Winning neuron</text>
+  <circle cx="430" cy="900" r="9" fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+  <!-- winner neuron B -->
+  <circle cx="470" cy="900" r="12" fill="#337ef5" stroke="#1a4487" stroke-width="2.5"/>
+  <circle cx="510" cy="900" r="9" fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       CONNECTIONS
+       ═══════════════════════════════════════════════════════ -->
+
+  <!-- 1. R → SNc with R label -->
+  <polyline points="195,500 265,500 265,550s"
+            stroke="#111" stroke-width="2.0" stroke-dasharray="9,5" fill="none" marker-end="url(#ah-blk)"/>
+  <text x="228" y="490" text-anchor="middle" font-size="20" font-weight="bold" font-style="italic" fill="#222">R</text>
+
+  <!-- 2. Q-value dashed: D1 left edge → left to x=310 → down to SNc top -->
+  <polyline points="507,420 310,420 310,545"
+            stroke="#7030a0" stroke-width="2" stroke-dasharray="9,5" fill="none"
+            marker-end="url(#ah-pur)"/>
+  <text x="350" y="410" text-anchor="middle" font-size="18" font-style="italic" fill="#7030a0" font-weight="bold">Q-value</text>
+
+
+  <!-- 3. D2 → GPe (right edge of D2 x=730 → GPe left x=780) -->
+  <line x1="730" y1="270" x2="778" y2="270"
+        stroke="#c0392b" stroke-width="2.0" marker-end="url(#ah-red)"/>
+
+  <!-- 4. GPe → STN, STN -> GPe (straight down, GPe bottom-centre y=312 → STN top y=385) -->
+  <line x1="850" y1="400" x2="850" y2="453"
+        stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+      
+  <line x1="880" y1="453" x2="880" y2="400"
+        stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+  <!-- 5. D1 neurons → GPi neurons  VERTICAL (x=430,470,510 aligned)
+       with Q(A), Q(B), Q(C) labels at midpoint y=(218+620)/2=419 -->
+  <line x1="430" y1="298" x2="430" y2="688" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+  <text x="462" y="410" text-anchor="end" font-size="14" font-style="italic" fill="#c0392b">Q(A)</text>
+
+  <line x1="470" y1="298" x2="470" y2="688" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+  <text x="487" y="410" text-anchor="middle" font-size="14" font-style="italic" fill="#c0392b">Q(B)</text>
+
+  <line x1="510" y1="298" x2="510" y2="688" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+  <text x="512" y="410" text-anchor="start" font-size="14" font-style="italic" fill="#c0392b">Q(C)</text>
+
+  <!-- 6. STN clusters → GPi neurons (green diagonals) -->
+  <line x1="814" y1="613" x2="432" y2="688" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+  <line x1="876" y1="613" x2="472" y2="688" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+  <line x1="938" y1="613" x2="512" y2="688" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+  <!-- 7. GPi → Thalamus (vertical x=430,470,510) -->
+  <line x1="430" y1="742" x2="430" y2="836" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+  <line x1="470" y1="742" x2="470" y2="836" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+  <line x1="510" y1="742" x2="510" y2="836" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+
+  <!-- 8. Thalamus winner → Task box (dashed) -->
+  <polyline points="470, 910, 470,970 91,970 91,550"
+            stroke="#111" stroke-width="2.2" fill="none" marker-end="url(#ah-blk)"
+            stroke-dasharray="10,4"/>
+  <text x="240" y="960" text-anchor="middle" font-size="17" fill="#333" font-style="italic">chosen card: B</text>
+
+
+
+   <!-- ======═════════════════════════════════
+       Connector points
+       ══════════════════════════════════ -->
+  <!-- 3 cortex neurons -->
+  <circle cx="430" cy="420" r="3" fill="#7030a0" stroke="#7030a0" stroke-width="2"/>
+  <circle cx="470" cy="420" r="3" fill="#7030a0" stroke="#7030a0" stroke-width="2"/>
+  <circle cx="510" cy="420" r="3" fill="#7030a0" stroke="#7030a0" stroke-width="2"/>
+
+  <!-- ═══════════════════════════════════════════════════════
+       COLOUR LEGEND
+       ═══════════════════════════════════════════════════════ -->
+  <line x1="218" y1="998" x2="268" y2="998" stroke="#1a7a1a" stroke-width="3"/>
+  <polygon points="263,992 274,998 263,1004" fill="#1a7a1a"/>
+  <text x="282" y="1004" font-size="19" fill="#1a7a1a">Excitatory</text>
+
+  <line x1="458" y1="998" x2="508" y2="998" stroke="#c0392b" stroke-width="3"/>
+  <polygon points="503,992 514,998 503,1004" fill="#c0392b"/>
+  <text x="522" y="1004" font-size="19" fill="#c0392b">Inhibitory</text>
+
+  <line x1="698" y1="998" x2="748" y2="998" stroke="#7030a0" stroke-width="3" stroke-dasharray="8,4"/>
+  <polygon points="743,992 754,998 743,1004" fill="#7030a0"/>
+  <text x="762" y="1004" font-size="19" fill="#7030a0">Dopaminergic</text>
+
+</svg>
+</body>
+</html>

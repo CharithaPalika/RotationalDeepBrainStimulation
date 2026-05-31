@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
+</style>
+</head>
+<body>
+<!--
+  LAYOUT (total 2100 × 1280):
+  Left  (BG):        x=0..1020,  y=0..1280  — BG scaled 0.86, tx=22, ty=55
+  Right-top (sDBS):  x=1030..2090, y=0..450  — smaller grid cell=16
+  Right-bottom(rDBS):x=1030..2090, y=460..1280 — grids + timeline + clock CENTRED below
+
+  Clock sector mapping (user-specified):
+    S0 = top-left    = blue   = 0°–90°
+    S1 = bottom-left = orange = 90°–180°
+    S2 = bottom-right= green  = 180°–270°
+    S3 = top-right   = purple = 270°–360°
+  Centre (cx,cy) = (450, 580) in rDBS local coords
+-->
+<svg viewBox="0 0 2100 1280" width="2100" height="1280"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="ah-blk" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#111"/>
+    </marker>
+    <marker id="ah-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#c0392b"/>
+    </marker>
+    <marker id="ah-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#1a7a1a"/>
+    </marker>
+    <marker id="ah-pur" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#7030a0"/>
+    </marker>
+    <marker id="ah-t" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#333"/>
+    </marker>
+    <linearGradient id="cbar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#cc2200"/>
+      <stop offset="50%"  stop-color="#f0a000"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2100" height="1280" fill="#ffffff"/>
+
+  <!-- Panel labels -->
+  <text x="22"   y="40" font-size="34" font-weight="bold" fill="#111">(a) Basal Ganglia Network</text>
+  <text x="1038" y="40" font-size="34" font-weight="bold" fill="#111">(b) Spatial DBS — Gaussian Spread (sDBS)</text>
+  <text x="1038" y="472" font-size="34" font-weight="bold" fill="#111">(c) Rotational DBS (rDBS)</text>
+
+  <!-- ══════════════════════════════════════════════════════════
+       (a) BG NETWORK  — scale 0.86, tx=22, ty=55
+       Decision box: x=1,y=265,w=260,h=310  (wider, bigger fonts)
+       Cortex: x=390, D1/D2/GPe/STN/GPi/Thalamus unchanged
+       ══════════════════════════════════════════════════════════ -->
+  <g transform="translate(22,55) scale(0.86)">
+
+    <!-- Decision Making Task Box: wider w=260 -->
+    <rect x="1" y="265" width="260" height="315" rx="8"
+          fill="#f9f9f9" stroke="#444" stroke-width="2.2"/>
+    <text x="131" y="296" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Decision Making</text>
+    <text x="131" y="321" text-anchor="middle" font-size="23" font-weight="bold" fill="#111">Task</text>
+
+    <!-- Reward plot axes inside box -->
+    <line x1="22" y1="425" x2="248" y2="425" stroke="#444" stroke-width="1.4"/>
+    <line x1="22" y1="345" x2="22"  y2="425" stroke="#444" stroke-width="1.4"/>
+    <text x="135" y="442" text-anchor="middle" font-size="17" fill="#222" font-style="italic">Reward</text>
+    <text x="11"  y="385" text-anchor="middle" font-size="17" fill="#222" font-style="italic"
+          transform="rotate(-90,11,385)">p(R)</text>
+
+    <!-- Arm C -->
+    <path d="M 22,425 C 30,425 44,425 60,404 C 72,387 74,380 80,378 C 86,380 88,387 100,404 C 116,425 130,425 130,425"
+          stroke="#888" stroke-width="1.8" fill="#88888818"/>
+    <line x1="80" y1="378" x2="80" y2="425" stroke="#888" stroke-width="1.1" stroke-dasharray="3,2"/>
+    <text x="80" y="371" text-anchor="middle" font-size="15" fill="#555" font-style="italic">μ_C</text>
+    <text x="80" y="357" text-anchor="middle" font-size="16" font-weight="bold" fill="#555">C</text>
+
+    <!-- Arm A -->
+    <path d="M 108,425 C 118,425 132,425 146,402 C 158,382 160,372 163,370 C 166,372 168,382 180,402 C 194,425 208,425 208,425"
+          stroke="#6699cc" stroke-width="1.8" fill="#6699cc18"/>
+    <line x1="163" y1="370" x2="163" y2="425" stroke="#6699cc" stroke-width="1.1" stroke-dasharray="3,2"/>
+    <text x="163" y="363" text-anchor="middle" font-size="15" fill="#4477aa" font-style="italic">μ_A</text>
+    <text x="163" y="349" text-anchor="middle" font-size="16" font-weight="bold" fill="#4477aa">A</text>
+
+    <!-- Arm B winner -->
+    <path d="M 186,425 C 196,425 208,425 215,402 C 222,380 223,358 225,356 C 227,358 228,380 235,402 C 242,425 254,425 254,425"
+          stroke="#2255aa" stroke-width="2.2" fill="#2255aa44"/>
+    <line x1="225" y1="356" x2="225" y2="425" stroke="#2255aa" stroke-width="1.3" stroke-dasharray="3,2"/>
+    <text x="225" y="349" text-anchor="middle" font-size="15" fill="#2255aa" font-style="italic">μ_B</text>
+    <text x="227" y="335" text-anchor="middle" font-size="16" font-weight="bold" fill="#2255aa">B ★</text>
+
+    <!-- Cards — centred in wider box -->
+    <rect x="28"  y="456" width="58" height="66" rx="5" fill="#fff"    stroke="#555" stroke-width="2"/>
+    <text x="57"  y="496" text-anchor="middle" font-size="24" font-weight="bold" fill="#333">A</text>
+    <rect x="101" y="456" width="58" height="66" rx="5" fill="#abcef5" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="130" y="496" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">B</text>
+    <rect x="174" y="456" width="58" height="66" rx="5" fill="#fff"    stroke="#555" stroke-width="2"/>
+    <text x="203" y="496" text-anchor="middle" font-size="24" font-weight="bold" fill="#333">C</text>
+
+    <!-- Reward formula -->
+    <text x="131" y="542" text-anchor="middle" font-size="18" fill="#111">
+      <tspan font-style="italic" font-weight="bold">R</tspan>
+      <tspan baseline-shift="sub" font-size="13">B</tspan>
+      <tspan> ~ 𝒩(μ</tspan>
+      <tspan baseline-shift="sub" font-size="13">B</tspan>
+      <tspan>, σ</tspan>
+      <tspan baseline-shift="sub" font-size="13">B</tspan>
+      <tspan baseline-shift="super" font-size="13">2</tspan>
+      <tspan>)</tspan>
+    </text>
+    <text x="131" y="565" text-anchor="middle" font-size="16" fill="#444">(reward drawn from B)</text>
+
+    <!-- SNc ellipse — cx=330 clears box right edge 262 -->
+    <ellipse cx="330" cy="615" rx="92" ry="56" fill="#f3eafa" stroke="#7030a0" stroke-width="2.5"/>
+    <text x="330" y="612" text-anchor="middle" font-size="28" font-weight="bold" fill="#7030a0">SNc</text>
+    <text x="330" y="639" text-anchor="middle" font-size="21" font-style="italic" fill="#7030a0">δ = R − Q</text>
+
+    <!-- Inputs A/B/C -->
+    <text x="470" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">A</text>
+    <line x1="470" y1="27" x2="470" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+    <text x="560" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">B</text>
+    <line x1="560" y1="27" x2="560" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+    <text x="650" y="22" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">C</text>
+    <line x1="650" y1="27" x2="650" y2="98" stroke="#2255aa" stroke-width="1.8" marker-end="url(#ah-blk)"/>
+
+    <!-- Cortex -->
+    <rect x="390" y="98" width="310" height="72" rx="8" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="545" y="133" text-anchor="middle" font-size="29" font-weight="bold" fill="#2255aa">Cortex</text>
+    <circle cx="470" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="560" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="650" cy="150" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- Cortex → D1/D2 -->
+    <line x1="466" y1="160" x2="433" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="474" y1="160" x2="604" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="556" y1="160" x2="473" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="564" y1="160" x2="644" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="646" y1="160" x2="513" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+    <line x1="654" y1="160" x2="684" y2="232" stroke="#111" stroke-width="1.5" marker-end="url(#ah-blk)"/>
+
+    <!-- D1 -->
+    <rect x="390" y="232" width="165" height="82" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="472" y="257" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">D₁</text>
+    <text x="430" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">A</text>
+    <text x="470" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">B</text>
+    <text x="510" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">C</text>
+    <circle cx="430" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="470" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="510" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- D2 -->
+    <rect x="565" y="232" width="165" height="82" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="647" y="257" text-anchor="middle" font-size="24" font-weight="bold" fill="#2255aa">D₂</text>
+    <text x="605" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">A</text>
+    <text x="645" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">B</text>
+    <text x="685" y="276" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">C</text>
+    <circle cx="605" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="645" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+    <circle cx="685" cy="292" r="10" fill="#99bbee" stroke="#2255aa" stroke-width="2"/>
+
+    <!-- GPe -->
+    <rect x="780" y="232" width="190" height="170" rx="7" fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="875" y="258" text-anchor="middle" font-size="26" font-weight="bold" fill="#c0392b">GPe</text>
+    <rect x="788" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="812" y="280" text-anchor="middle" font-size="15" fill="#c0392b" font-style="italic">c₀</text>
+    <circle cx="812" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="812" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="812" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="812" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <rect x="846" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="870" y="280" text-anchor="middle" font-size="15" fill="#c0392b" font-style="italic">c₁</text>
+    <circle cx="870" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="870" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="870" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="870" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <rect x="904" y="264" width="48" height="125" rx="4" fill="#ffd8cc" stroke="#c0392b" stroke-width="1.4"/>
+    <text x="928" y="280" text-anchor="middle" font-size="15" fill="#c0392b" font-style="italic">c₂</text>
+    <circle cx="928" cy="297" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="928" cy="320" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="928" cy="343" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+    <circle cx="928" cy="366" r="7" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.4"/>
+
+    <!-- STN -->
+    <rect x="780" y="458" width="200" height="170" rx="7" fill="#f0fff0" stroke="#1a7a1a" stroke-width="2.5"/>
+    <text x="880" y="483" text-anchor="middle" font-size="26" font-weight="bold" fill="#1a7a1a">STN</text>
+    <rect x="788" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="814" y="510" text-anchor="middle" font-size="15" fill="#1a7a1a" font-style="italic">c₀</text>
+    <circle cx="814" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="814" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="814" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="814" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <rect x="850" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="876" y="510" text-anchor="middle" font-size="15" fill="#1a7a1a" font-style="italic">c₁</text>
+    <circle cx="876" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="876" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="876" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="876" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <rect x="912" y="493" width="52" height="122" rx="4" fill="#d4f5d4" stroke="#1a7a1a" stroke-width="1.4"/>
+    <text x="938" y="510" text-anchor="middle" font-size="15" fill="#1a7a1a" font-style="italic">c₂</text>
+    <circle cx="938" cy="525" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="938" cy="547" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="938" cy="569" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+    <circle cx="938" cy="591" r="7" fill="#88dd88" stroke="#1a7a1a" stroke-width="1.4"/>
+
+    <!-- GPi -->
+    <rect x="390" y="720" width="340" height="65" rx="7" fill="#fff0ee" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="560" y="749" text-anchor="middle" font-size="26" font-weight="bold" fill="#c0392b">GPi</text>
+    <circle cx="430" cy="762" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+    <circle cx="470" cy="762" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+    <circle cx="510" cy="762" r="9" fill="#ffbbaa" stroke="#c0392b" stroke-width="1.8"/>
+
+    <!-- Thalamus -->
+    <rect x="390" y="870" width="340" height="105" rx="7" fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+    <text x="560" y="898" text-anchor="middle" font-size="26" font-weight="bold" fill="#2255aa">Thalamus</text>
+    <text x="430" y="918" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">A</text>
+    <text x="470" y="918" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">B</text>
+    <text x="510" y="918" text-anchor="middle" font-size="15" font-weight="bold" fill="#2255aa">C</text>
+    <text x="530" y="962" text-anchor="middle" font-size="15" font-style="italic" fill="#2255aa">Winning neuron</text>
+    <circle cx="430" cy="932" r="9"  fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+    <circle cx="470" cy="932" r="12" fill="#337ef5" stroke="#1a4487" stroke-width="2.5"/>
+    <circle cx="510" cy="932" r="9"  fill="#99bbee" stroke="#2255aa" stroke-width="1.8"/>
+
+    <!-- CONNECTIONS -->
+    <!-- R: task box right→SNc -->
+    <polyline points="262,515 335,515 335,561"
+              stroke="#111" stroke-width="2.0" stroke-dasharray="8,5" fill="none" marker-end="url(#ah-blk)"/>
+    <text x="298" y="505" text-anchor="middle" font-size="22" font-weight="bold" font-style="italic" fill="#111">R</text>
+
+    <!-- Q-value: D1→SNc -->
+    <polyline points="507,435 336,435 336,561"
+              stroke="#7030a0" stroke-width="2" stroke-dasharray="8,5" fill="none" marker-end="url(#ah-pur)"/>
+    <text x="380" y="424" text-anchor="middle" font-size="19" font-style="italic" fill="#7030a0" font-weight="bold">Q-value</text>
+
+    <!-- D2→GPe -->
+    <line x1="730" y1="274" x2="778" y2="274" stroke="#c0392b" stroke-width="2.0" marker-end="url(#ah-red)"/>
+
+    <!-- GPe↔STN -->
+    <line x1="852" y1="402" x2="852" y2="456" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="882" y1="456" x2="882" y2="402" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+    <!-- D1→GPi -->
+    <line x1="430" y1="302" x2="430" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="458" y="445" text-anchor="end"    font-size="15" font-style="italic" fill="#c0392b">Q(A)</text>
+    <line x1="470" y1="302" x2="470" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="480" y="445" text-anchor="middle" font-size="15" font-style="italic" fill="#c0392b">Q(B)</text>
+    <line x1="510" y1="302" x2="510" y2="718" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <text x="514" y="445" text-anchor="start"  font-size="15" font-style="italic" fill="#c0392b">Q(C)</text>
+
+    <!-- STN→GPi -->
+    <line x1="814" y1="616" x2="432" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+    <line x1="876" y1="616" x2="472" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+    <line x1="938" y1="616" x2="512" y2="718" stroke="#1a7a1a" stroke-width="1.5" marker-end="url(#ah-grn)"/>
+
+    <!-- GPi→Thalamus -->
+    <line x1="430" y1="772" x2="430" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="470" y1="772" x2="470" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+    <line x1="510" y1="772" x2="510" y2="868" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-red)"/>
+
+    <!-- Thalamus→Task box feedback -->
+    <polyline points="470,942 470,1015 131,1015 131,580"
+              stroke="#111" stroke-width="2.2" fill="none" marker-end="url(#ah-blk)" stroke-dasharray="10,4"/>
+    <text x="295" y="1005" text-anchor="middle" font-size="18" fill="#333" font-style="italic">chosen card: B</text>
+
+    <!-- Purple dots on D1 lines -->
+    <circle cx="430" cy="435" r="3.5" fill="#7030a0" stroke="#7030a0" stroke-width="2"/>
+    <circle cx="470" cy="435" r="3.5" fill="#7030a0" stroke="#7030a0" stroke-width="2"/>
+    <circle cx="510" cy="435" r="3.5" fill="#7030a0" stroke="#7030a0" stroke-width="2"/>
+
+    <!-- Legend -->
+    <line x1="180" y1="1060" x2="244" y2="1060" stroke="#1a7a1a" stroke-width="3"/>
+    <polygon points="239,1054 250,1060 239,1066" fill="#1a7a1a"/>
+    <text x="260" y="1066" font-size="20" fill="#1a7a1a">Excitatory</text>
+    <line x1="440" y1="1060" x2="504" y2="1060" stroke="#c0392b" stroke-width="3"/>
+    <polygon points="499,1054 510,1060 499,1066" fill="#c0392b"/>
+    <text x="520" y="1066" font-size="20" fill="#c0392b">Inhibitory</text>
+    <line x1="710" y1="1060" x2="774" y2="1060" stroke="#7030a0" stroke-width="3" stroke-dasharray="8,4"/>
+    <polygon points="769,1054 780,1060 769,1066" fill="#7030a0"/>
+    <text x="790" y="1066" font-size="20" fill="#7030a0">Dopaminergic</text>
+
+  </g>
+  <!-- END (a) BG -->
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       (b) sDBS — smaller grid (cell=16), grid 256×256
+       translate(1038, 55)
+       ox=60, oy=55 → grid right edge = 60+256=316, colorbar at 330
+       ══════════════════════════════════════════════════════════ -->
+  <g transform="translate(1038,55)">
+
+    <g id="sdbs-grid"></g>
+
+    <!-- Grid border -->
+    <rect x="60" y="55" width="256" height="256" fill="none" stroke="#333" stroke-width="2.5"/>
+
+    <!-- Electrode needle, tip at pixel ~(188,188) = cell(7,7) centre with offset -->
+    <polygon points="184,0 192,0 190,178 188,186 187,179"
+             fill="#666" stroke="#333" stroke-width="1"
+             transform="rotate(15,188,186)"/>
+    <rect x="181" y="0" width="14" height="10" rx="3"
+          fill="#888" stroke="#333" stroke-width="1"
+          transform="rotate(15,188,186)"/>
+    <circle cx="188" cy="186" r="3" fill="#111" stroke="#333" stroke-width="1"
+            transform="rotate(15,188,186)"/>
+
+    <!-- (cx,cy) label -->
+    <text x="202" y="200" font-size="18" font-weight="bold" fill="#111" font-style="italic">
+      <tspan>(c</tspan><tspan baseline-shift="sub" font-size="13">x</tspan>
+      <tspan>, c</tspan><tspan baseline-shift="sub" font-size="13">y</tspan><tspan>)</tspan>
+    </text>
+
+    <!-- Axis labels -->
+    <text x="188" y="328" text-anchor="middle" font-size="19" fill="#111" font-style="italic" font-weight="bold">j →</text>
+    <text x="30"  y="183" text-anchor="middle" font-size="19" fill="#111" font-style="italic" font-weight="bold"
+          transform="rotate(-90,30,183)">i →</text>
+
+    <!-- Colour bar -->
+    <rect x="330" y="55" width="16" height="256" fill="url(#cbar)" stroke="#555" stroke-width="1.2"/>
+    <text x="324" y="59"  text-anchor="end" font-size="16" fill="#111" font-weight="bold">1</text>
+    <text x="324" y="185" text-anchor="end" font-size="16" fill="#111" font-weight="bold">0.5</text>
+    <text x="324" y="313" text-anchor="end" font-size="16" fill="#111" font-weight="bold">0</text>
+    <text x="362" y="183" text-anchor="middle" font-size="17" fill="#111" font-weight="bold"
+          transform="rotate(90,362,183)">w(i,j)</text>
+
+  </g>
+  <!-- END (b) sDBS -->
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       (c) rDBS — 4 grids + timeline + clock centred below
+       translate(1038, 490)
+       Right panel width: 2090-1038=1052px
+
+       Grids: N=16, cell=13 → 208×208 each, 4 grids
+         Grid 0: x=10,  y=55
+         Grid 1: x=228, y=55
+         Grid 2: x=446, y=55
+         Grid 3: x=664, y=55
+
+       Timeline: y=330..395, axis y=400, ticks y=420
+       "repeats" symbol at x=895 y=360
+
+       Clock: r=100, centred at x=450 (= (10+208*4/2+10)/2 ≈ centre of 4 grids)
+              actually centre of grids span: left=10, right=664+208=872 → cx=(10+872)/2=441
+              cy = 580 (below timeline tick labels)
+       ══════════════════════════════════════════════════════════ -->
+  <g transform="translate(1038,490)">
+
+    <g id="rdbs-grids"></g>
+
+    <!-- Sector titles above grids -->
+    <text x="114"  y="44" text-anchor="middle" font-size="21" font-weight="bold" fill="#111">Sector 0</text>
+    <text x="332"  y="44" text-anchor="middle" font-size="21" font-weight="bold" fill="#111">Sector 1</text>
+    <text x="550"  y="44" text-anchor="middle" font-size="21" font-weight="bold" fill="#111">Sector 2</text>
+    <text x="768"  y="44" text-anchor="middle" font-size="21" font-weight="bold" fill="#111">Sector 3</text>
+
+    <!-- Degree range labels below grids -->
+    <text x="114"  y="276" text-anchor="middle" font-size="18" font-weight="bold" fill="#2255aa">0° – 90°</text>
+    <text x="332"  y="276" text-anchor="middle" font-size="18" font-weight="bold" fill="#cc5500">90° – 180°</text>
+    <text x="550"  y="276" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a6e1a">180° – 270°</text>
+    <text x="768"  y="276" text-anchor="middle" font-size="18" font-weight="bold" fill="#7030a0">270° – 360°</text>
+
+    <!-- t-interval labels -->
+    <text x="114"  y="298" text-anchor="middle" font-size="15" fill="#333">t ∈ [0, T<tspan baseline-shift="sub" font-size="11">s</tspan>)</text>
+    <text x="332"  y="298" text-anchor="middle" font-size="15" fill="#333">t ∈ [T<tspan baseline-shift="sub" font-size="11">s</tspan>, 2T<tspan baseline-shift="sub" font-size="11">s</tspan>)</text>
+    <text x="550"  y="298" text-anchor="middle" font-size="15" fill="#333">t ∈ [2T<tspan baseline-shift="sub" font-size="11">s</tspan>, 3T<tspan baseline-shift="sub" font-size="11">s</tspan>)</text>
+    <text x="768"  y="298" text-anchor="middle" font-size="15" fill="#333">t ∈ [3T<tspan baseline-shift="sub" font-size="11">s</tspan>, 4T<tspan baseline-shift="sub" font-size="11">s</tspan>)</text>
+
+    <!-- TIMELINE -->
+    <line x1="10" y1="396" x2="882" y2="396" stroke="#333" stroke-width="2" marker-end="url(#ah-t)"/>
+    <text x="896" y="403" font-size="21" fill="#333" font-style="italic">t</text>
+
+    <rect x="10"  y="330" width="218" height="63" fill="#ddeeff" stroke="#2255aa" stroke-width="2"/>
+    <text x="119" y="357" text-anchor="middle" font-size="18" font-weight="bold" fill="#2255aa">Sector 0</text>
+    <text x="119" y="380" text-anchor="middle" font-size="15" fill="#2255aa">0° – 90°</text>
+
+    <rect x="228" y="330" width="218" height="63" fill="#fde8cc" stroke="#cc5500" stroke-width="2"/>
+    <text x="337" y="357" text-anchor="middle" font-size="18" font-weight="bold" fill="#cc5500">Sector 1</text>
+    <text x="337" y="380" text-anchor="middle" font-size="15" fill="#cc5500">90° – 180°</text>
+
+    <rect x="446" y="330" width="218" height="63" fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2"/>
+    <text x="555" y="357" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a6e1a">Sector 2</text>
+    <text x="555" y="380" text-anchor="middle" font-size="15" fill="#1a6e1a">180° – 270°</text>
+
+    <rect x="664" y="330" width="218" height="63" fill="#f0e0ff" stroke="#7030a0" stroke-width="2"/>
+    <text x="773" y="357" text-anchor="middle" font-size="18" font-weight="bold" fill="#7030a0">Sector 3</text>
+    <text x="773" y="380" text-anchor="middle" font-size="15" fill="#7030a0">270° – 360°</text>
+
+    <!-- Tick marks and labels -->
+    <line x1="10"  y1="391" x2="10"  y2="407" stroke="#333" stroke-width="1.5"/>
+    <line x1="228" y1="391" x2="228" y2="407" stroke="#333" stroke-width="1.5"/>
+    <line x1="446" y1="391" x2="446" y2="407" stroke="#333" stroke-width="1.5"/>
+    <line x1="664" y1="391" x2="664" y2="407" stroke="#333" stroke-width="1.5"/>
+    <line x1="882" y1="391" x2="882" y2="407" stroke="#333" stroke-width="1.5"/>
+    <text x="10"  y="425" text-anchor="middle" font-size="15" fill="#222">0</text>
+    <text x="228" y="425" text-anchor="middle" font-size="15" fill="#222">T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+    <text x="446" y="425" text-anchor="middle" font-size="15" fill="#222">2T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+    <text x="664" y="425" text-anchor="middle" font-size="15" fill="#222">3T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+    <text x="882" y="425" text-anchor="middle" font-size="15" fill="#222">4T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+
+    <!-- repeats symbol - right of timeline -->
+    <text x="910" y="370" font-size="26" fill="#555">↻</text>
+    <text x="910" y="340" text-anchor="middle" font-size="14" fill="#666" font-style="italic">repeats</text>
+
+    <!-- ══ CLOCK — centred at cx=441, cy=578, r=105
+         Grids span x=10..872 → centre x=(10+872)/2=441
+         Sector mapping (user spec):
+           S0 = top-left    = blue   = 0°–90°    → from 270° to 360° in SVG angles = left quadrant top
+           Wait — user says:
+             S0: top-left   (top half, left half of circle)  → x<cx, y<cy  → 180°..270° in standard math → SVG arc top-left
+             S1: bottom-left (bottom half, left half)         → x<cx, y>cy  → 90°..180° standard → SVG arc bottom-left
+             S2: bottom-right(bottom half, right half)        → x>cx, y>cy  → 0°..90°  standard → SVG arc bottom-right
+             S3: top-right   (top half, right half)           → x>cx, y<cy  → 270°..360° standard → SVG arc top-right
+
+         In SVG path arcs (clockwise positive):
+           top-left    quadrant: centre→left→top→centre  = M cx,cy L cx-r,cy A r,r 0 0,1 cx,cy-r Z
+           bottom-left quadrant: centre→bottom→left→centre= M cx,cy L cx,cy+r A r,r 0 0,1 cx-r,cy Z
+           bottom-right quadrant:centre→right→bottom      = M cx,cy L cx+r,cy A r,r 0 0,1 cx,cy+r Z
+           top-right   quadrant: centre→top→right         = M cx,cy L cx,cy-r A r,r 0 0,1 cx+r,cy Z
+    -->
+    <text x="441" y="452" text-anchor="middle" font-size="16" fill="#333" font-style="italic">
+      f<tspan baseline-shift="sub" font-size="11">rot</tspan>
+      <tspan> = 5 Hz,  T</tspan><tspan baseline-shift="sub" font-size="11">s</tspan>
+      <tspan> = 50 ms</tspan>
+    </text>
+
+    <!-- S0: top-left, blue, 0°–90° -->
+    <path d="M 441,578 L 336,578 A 105,105 0 0,1 441,473 Z"
+          fill="#ddeeff" stroke="#2255aa" stroke-width="2.2"/>
+    <!-- S1: bottom-left, orange, 90°–180° -->
+    <path d="M 441,578 L 441,683 A 105,105 0 0,1 336,578 Z"
+          fill="#fde8cc" stroke="#cc5500" stroke-width="2.2"/>
+    <!-- S2: bottom-right, green, 180°–270° -->
+    <path d="M 441,578 L 546,578 A 105,105 0 0,1 441,683 Z"
+          fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2.2"/>
+    <!-- S3: top-right, purple, 270°–360° -->
+    <path d="M 441,578 L 441,473 A 105,105 0 0,1 546,578 Z"
+          fill="#f0e0ff" stroke="#7030a0" stroke-width="2.2"/>
+
+    <!-- Spokes -->
+    <line x1="441" y1="578" x2="441" y2="473" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+    <line x1="441" y1="578" x2="546" y2="578" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+    <line x1="441" y1="578" x2="441" y2="683" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+    <line x1="441" y1="578" x2="336" y2="578" stroke="#555" stroke-width="1.3" stroke-dasharray="4,3"/>
+
+    <!-- Degree labels -->
+    <text x="441" y="463" text-anchor="middle" font-size="17" fill="#111" font-weight="bold">0°</text>
+    <text x="558" y="583" text-anchor="start"  font-size="17" fill="#111" font-weight="bold">90°</text>
+    <text x="441" y="703" text-anchor="middle" font-size="17" fill="#111" font-weight="bold">180°</text>
+    <text x="324" y="583" text-anchor="end"    font-size="17" fill="#111" font-weight="bold">270°</text>
+
+    <!-- Sector labels inside slices -->
+    <text x="403" y="530" text-anchor="middle" font-size="17" font-weight="bold" fill="#2255aa">S0</text>
+    <text x="403" y="548" text-anchor="middle" font-size="13" fill="#2255aa">0°–90°</text>
+    <text x="403" y="626" text-anchor="middle" font-size="17" font-weight="bold" fill="#cc5500">S1</text>
+    <text x="403" y="643" text-anchor="middle" font-size="13" fill="#cc5500">90°–180°</text>
+    <text x="479" y="626" text-anchor="middle" font-size="17" font-weight="bold" fill="#1a6e1a">S2</text>
+    <text x="479" y="643" text-anchor="middle" font-size="13" fill="#1a6e1a">180°–270°</text>
+    <text x="479" y="530" text-anchor="middle" font-size="17" font-weight="bold" fill="#7030a0">S3</text>
+    <text x="479" y="548" text-anchor="middle" font-size="13" fill="#7030a0">270°–360°</text>
+
+    <!-- Centre dot -->
+    <circle cx="441" cy="578" r="6" fill="#111" stroke="#fff" stroke-width="1.5"/>
+    <text x="452" y="596" font-size="14" fill="#333" font-style="italic">
+      (c<tspan baseline-shift="sub" font-size="10">x</tspan>, c<tspan baseline-shift="sub" font-size="10">y</tspan>)
+    </text>
+
+    <!-- CW rotation arrow (r=120, from top going clockwise) -->
+    <path d="M 465,461 A 120,120 0 0,1 561,602"
+          fill="none" stroke="#333" stroke-width="2.2"/>
+    <polygon points="558,615 561,602 550,606" fill="#333"/>
+    <text x="572" y="546" font-size="16" fill="#333" font-style="italic">f<tspan baseline-shift="sub" font-size="12">rot</tspan></text>
+
+  </g>
+  <!-- END (c) rDBS -->
+
+</svg>
+
+<script>
+(function(){
+  const ns='http://www.w3.org/2000/svg';
+
+  // ── sDBS: cell=16, ox=60, oy=55 ──
+  const sN=16,sCell=16,sox=60,soy=55,sc=7,sSigma=4;
+  const sGrid=document.getElementById('sdbs-grid');
+  for(let i=0;i<sN;i++){
+    for(let j=0;j<sN;j++){
+      const w=Math.exp(-((i-sc)**2+(j-sc)**2)/(2*sSigma**2));
+      const r=Math.round(255-(255-204)*w);
+      const g=Math.round(255-(255-34)*w);
+      const b=Math.round(255-255*w);
+      const rect=document.createElementNS(ns,'rect');
+      rect.setAttribute('x',sox+j*sCell);
+      rect.setAttribute('y',soy+i*sCell);
+      rect.setAttribute('width',sCell);
+      rect.setAttribute('height',sCell);
+      rect.setAttribute('fill',`rgb(${r},${g},${b})`);
+      rect.setAttribute('stroke','#ccc');
+      rect.setAttribute('stroke-width','0.4');
+      sGrid.appendChild(rect);
+    }
+  }
+
+  // ── rDBS: cell=13, 4 grids ──
+  // Sector quad activation matches grid sector labels:
+  // Sector 0 (top-left,  blue)  → top-left  quadrant of grid → rMin:0, rMax:8, cMin:0, cMax:8
+  // Sector 1 (btm-left,  orange)→ btm-left  quadrant        → rMin:8, rMax:16,cMin:0, cMax:8
+  // Sector 2 (btm-right, green) → btm-right quadrant        → rMin:8, rMax:16,cMin:8, cMax:16
+  // Sector 3 (top-right, purple)→ top-right quadrant        → rMin:0, rMax:8, cMin:8, cMax:16
+  const rN=16,rCell=13,half=rN/2;
+  const gridOrigins=[{x:10,y:55},{x:228,y:55},{x:446,y:55},{x:664,y:55}];
+  const sectorQuads=[
+    {rMin:0, rMax:8, cMin:0, cMax:8 },
+    {rMin:8, rMax:16,cMin:0, cMax:8 },
+    {rMin:8, rMax:16,cMin:8, cMax:16},
+    {rMin:0, rMax:8, cMin:8, cMax:16}
+  ];
+  const activeColors=['#2255aa','#cc5500','#1a6e1a','#7030a0'];
+  const hexBase={'#2255aa':[34,85,170],'#cc5500':[204,85,0],'#1a6e1a':[26,110,26],'#7030a0':[112,48,160]};
+  const rGrids=document.getElementById('rdbs-grids');
+  const c_idx=7,rSigma=4;
+
+  gridOrigins.forEach((origin,sIdx)=>{
+    const quad=sectorQuads[sIdx],col=activeColors[sIdx];
+    for(let i=0;i<rN;i++){
+      for(let j=0;j<rN;j++){
+        const isActive=i>=quad.rMin&&i<quad.rMax&&j>=quad.cMin&&j<quad.cMax;
+        let fill;
+        if(isActive){
+          const w=Math.exp(-((i-c_idx)**2+(j-c_idx)**2)/(2*rSigma**2));
+          const[r0,g0,b0]=hexBase[col];
+          fill=`rgb(${Math.round(255-(255-r0)*w)},${Math.round(255-(255-g0)*w)},${Math.round(255-(255-b0)*w)})`;
+        }else{ fill='#f0f0f0'; }
+        const rect=document.createElementNS(ns,'rect');
+        rect.setAttribute('x',origin.x+j*rCell);
+        rect.setAttribute('y',origin.y+i*rCell);
+        rect.setAttribute('width',rCell); rect.setAttribute('height',rCell);
+        rect.setAttribute('fill',fill);
+        rect.setAttribute('stroke','#ccc'); rect.setAttribute('stroke-width','0.3');
+        rGrids.appendChild(rect);
+      }
+    }
+    const border=document.createElementNS(ns,'rect');
+    border.setAttribute('x',origin.x); border.setAttribute('y',origin.y);
+    border.setAttribute('width',rN*rCell); border.setAttribute('height',rN*rCell);
+    border.setAttribute('fill','none'); border.setAttribute('stroke',col);
+    border.setAttribute('stroke-width','2.5');
+    rGrids.appendChild(border);
+    const mid=half*rCell;
+    const vl=document.createElementNS(ns,'line');
+    vl.setAttribute('x1',origin.x+mid); vl.setAttribute('y1',origin.y);
+    vl.setAttribute('x2',origin.x+mid); vl.setAttribute('y2',origin.y+rN*rCell);
+    vl.setAttribute('stroke','#999'); vl.setAttribute('stroke-width','1');
+    rGrids.appendChild(vl);
+    const hl=document.createElementNS(ns,'line');
+    hl.setAttribute('x1',origin.x); hl.setAttribute('y1',origin.y+mid);
+    hl.setAttribute('x2',origin.x+rN*rCell); hl.setAttribute('y2',origin.y+mid);
+    hl.setAttribute('stroke','#999'); hl.setAttribute('stroke-width','1');
+    rGrids.appendChild(hl);
+    const hi=document.createElementNS(ns,'rect');
+    hi.setAttribute('x',origin.x+quad.cMin*rCell);
+    hi.setAttribute('y',origin.y+quad.rMin*rCell);
+    hi.setAttribute('width',(quad.cMax-quad.cMin)*rCell);
+    hi.setAttribute('height',(quad.rMax-quad.rMin)*rCell);
+    hi.setAttribute('fill','none'); hi.setAttribute('stroke',col);
+    hi.setAttribute('stroke-width','3');
+    rGrids.appendChild(hi);
+  });
+})();
+</script>
+</body>
+</html>

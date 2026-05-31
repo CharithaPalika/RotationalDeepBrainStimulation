@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; padding: 30px; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1200 660" width="1200" height="660"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <marker id="ah-t" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#333"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="660" fill="#fff"/>
+
+  <!-- ═══════════════════════════════════
+       4 SECTOR GRIDS  (top row)
+       16×16 cells, cell=11px → 176×176
+       x: 18, 210, 402, 594   y=58
+       ═══════════════════════════════════ -->
+  <g id="grids"></g>
+
+  <!-- Sector titles above grids -->
+  <text x="106" y="48" text-anchor="middle" font-size="19" font-weight="bold" fill="#222">Sector 0</text>
+  <text x="298" y="48" text-anchor="middle" font-size="19" font-weight="bold" fill="#222">Sector 1</text>
+  <text x="490" y="48" text-anchor="middle" font-size="19" font-weight="bold" fill="#222">Sector 2</text>
+  <text x="682" y="48" text-anchor="middle" font-size="19" font-weight="bold" fill="#222">Sector 3</text>
+
+  <!-- Degree range labels below each grid -->
+  <text x="106" y="254" text-anchor="middle" font-size="17" font-weight="bold" fill="#2255aa">0° – 90°</text>
+  <text x="298" y="254" text-anchor="middle" font-size="17" font-weight="bold" fill="#cc5500">90° – 180°</text>
+  <text x="490" y="254" text-anchor="middle" font-size="17" font-weight="bold" fill="#1a6e1a">180° – 270°</text>
+  <text x="682" y="254" text-anchor="middle" font-size="17" font-weight="bold" fill="#7030a0">270° – 360°</text>
+
+  <!-- t-interval labels -->
+  <text x="106" y="274" text-anchor="middle" font-size="14" fill="#555">
+    t ∈ [0, T<tspan baseline-shift="sub" font-size="11">s</tspan>)
+  </text>
+  <text x="298" y="274" text-anchor="middle" font-size="14" fill="#555">
+    t ∈ [T<tspan baseline-shift="sub" font-size="11">s</tspan>, 2T<tspan baseline-shift="sub" font-size="11">s</tspan>)
+  </text>
+  <text x="490" y="274" text-anchor="middle" font-size="14" fill="#555">
+    t ∈ [2T<tspan baseline-shift="sub" font-size="11">s</tspan>, 3T<tspan baseline-shift="sub" font-size="11">s</tspan>)
+  </text>
+  <text x="682" y="274" text-anchor="middle" font-size="14" fill="#555">
+    t ∈ [3T<tspan baseline-shift="sub" font-size="11">s</tspan>, 4T<tspan baseline-shift="sub" font-size="11">s</tspan>)
+  </text>
+
+  <!-- ═══════════════════════════════════
+       CLOCK DIAGRAM
+       Centre: cx=960, cy=160, r=118
+       S0: top-left    (blue)
+       S1: top-right   (orange)
+       S2: bottom-right (green)
+       S3: bottom-left (purple)
+
+       SVG arc angles from 3-o'clock CW:
+         top:    (960, 42)
+         right:  (1078, 160)
+         bottom: (960, 278)
+         left:   (842, 160)
+
+       Slice mid-points at r=72:
+         S0 top-left    315°: x=960-51=909, y=160-51=109
+         S1 top-right    45°: x=960+51=1011, y=160-51=109
+         S2 bottom-right 135°: x=1011,       y=160+51=211
+         S3 bottom-left  225°: x=909,         y=211
+  ═══════════════════════════════════ -->
+
+  <!-- f_rot / T_s above circle -->
+  <text x="960" y="18" text-anchor="middle" font-size="16" fill="#333" font-style="italic">
+    f<tspan baseline-shift="sub" font-size="11">rot</tspan>
+    <tspan> = 5 Hz,  </tspan>
+    T<tspan baseline-shift="sub" font-size="11">s</tspan>
+    <tspan> = 1/(4·f</tspan><tspan baseline-shift="sub" font-size="11">rot</tspan><tspan>) = 50 ms</tspan>
+  </text>
+
+  <!-- S0: top-left, blue — SVG: left→top (180°→270° in SVG = top-left quadrant) -->
+  <path d="M 960,160 L 842,160 A 118,118 0 0,1 960,42 Z"
+        fill="#ddeeff" stroke="#2255aa" stroke-width="2.5"/>
+
+  <!-- S1: top-right, orange — SVG: top→right -->
+  <path d="M 960,160 L 960,42 A 118,118 0 0,1 1078,160 Z"
+        fill="#fde8cc" stroke="#cc5500" stroke-width="2.5"/>
+
+  <!-- S2: bottom-right, green — SVG: right→bottom -->
+  <path d="M 960,160 L 1078,160 A 118,118 0 0,1 960,278 Z"
+        fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2.5"/>
+
+  <!-- S3: bottom-left, purple — SVG: bottom→left -->
+  <path d="M 960,160 L 960,278 A 118,118 0 0,1 842,160 Z"
+        fill="#f0e0ff" stroke="#7030a0" stroke-width="2.5"/>
+
+  <!-- Spoke lines (dashed radii) -->
+  <line x1="960" y1="160" x2="960"  y2="42"  stroke="#666" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="960" y1="160" x2="1078" y2="160" stroke="#666" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="960" y1="160" x2="960"  y2="278" stroke="#666" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <line x1="960" y1="160" x2="842"  y2="160" stroke="#666" stroke-width="1.4" stroke-dasharray="5,3"/>
+
+  <!-- Degree labels outside perimeter -->
+  <text x="960"  y="30"  text-anchor="middle" font-size="17" fill="#222" font-weight="bold">0°</text>
+  <text x="1090" y="165" text-anchor="start"  font-size="17" fill="#222" font-weight="bold">90°</text>
+  <text x="960"  y="298" text-anchor="middle" font-size="17" fill="#222" font-weight="bold">180°</text>
+  <text x="828"  y="165" text-anchor="end"    font-size="17" fill="#222" font-weight="bold">270°</text>
+
+  <!-- Sector labels INSIDE slices at r=72 -->
+  <!-- S0: top-left (909, 109) -->
+  <text x="909" y="106" text-anchor="middle" font-size="19" font-weight="bold" fill="#2255aa">S0</text>
+  <text x="909" y="126" text-anchor="middle" font-size="13" fill="#2255aa">0°–90°</text>
+
+  <!-- S1: top-right (1011, 109) -->
+  <text x="1011" y="106" text-anchor="middle" font-size="19" font-weight="bold" fill="#cc5500">S1</text>
+  <text x="1011" y="126" text-anchor="middle" font-size="13" fill="#cc5500">90°–180°</text>
+
+  <!-- S2: bottom-right (1011, 211) -->
+  <text x="1011" y="208" text-anchor="middle" font-size="19" font-weight="bold" fill="#1a6e1a">S2</text>
+  <text x="1011" y="226" text-anchor="middle" font-size="13" fill="#1a6e1a">180°–270°</text>
+
+  <!-- S3: bottom-left (909, 211) -->
+  <text x="909" y="208" text-anchor="middle" font-size="19" font-weight="bold" fill="#7030a0">S3</text>
+  <text x="909" y="226" text-anchor="middle" font-size="13" fill="#7030a0">270°–360°</text>
+
+  <!-- Centre dot + electrode label -->
+  <circle cx="960" cy="160" r="7" fill="#222" stroke="#fff" stroke-width="1.5"/>
+  <text x="975" y="178" font-size="13" fill="#444" font-style="italic">
+    (c<tspan baseline-shift="sub" font-size="10">x</tspan>, c<tspan baseline-shift="sub" font-size="10">y</tspan>)
+  </text>
+
+  <!-- CW rotation arrow outside at r=135 -->
+  <path d="M 988,30 A 135,135 0 0,1 1095,188"
+        fill="none" stroke="#333" stroke-width="2.5"/>
+  <polygon points="1092,201 1095,188 1084,192" fill="#333"/>
+  <text x="1104" y="122" font-size="16" fill="#333" font-style="italic">
+    f<tspan baseline-shift="sub" font-size="12">rot</tspan>
+  </text>
+
+  <!-- T_s annotation on S1 arc -->
+  <text x="1120" y="88" text-anchor="middle" font-size="14" fill="#cc5500" font-style="italic">
+    T<tspan baseline-shift="sub" font-size="15">s</tspan> = 50 ms
+  </text>
+
+  <!-- ═══════════════════════════════════
+       TIMELINE
+       y=300..360, x=18..840
+       4 blocks 205px each
+       ═══════════════════════════════════ -->
+  <line x1="18" y1="365" x2="848" y2="365" stroke="#333" stroke-width="2" marker-end="url(#ah-t)"/>
+  <text x="862" y="371" font-size="20" fill="#333" font-style="italic">t</text>
+
+  <rect x="18"  y="305" width="205" height="60" fill="#ddeeff" stroke="#2255aa" stroke-width="2"/>
+  <text x="121" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#2255aa">Sector 0</text>
+  <text x="121" y="352" text-anchor="middle" font-size="14" fill="#2255aa">0° – 90°</text>
+
+  <rect x="223" y="305" width="205" height="60" fill="#fde8cc" stroke="#cc5500" stroke-width="2"/>
+  <text x="326" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#cc5500">Sector 1</text>
+  <text x="326" y="352" text-anchor="middle" font-size="14" fill="#cc5500">90° – 180°</text>
+
+  <rect x="428" y="305" width="205" height="60" fill="#d8f5d8" stroke="#1a6e1a" stroke-width="2"/>
+  <text x="531" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#1a6e1a">Sector 2</text>
+  <text x="531" y="352" text-anchor="middle" font-size="14" fill="#1a6e1a">180° – 270°</text>
+
+  <rect x="633" y="305" width="205" height="60" fill="#f0e0ff" stroke="#7030a0" stroke-width="2"/>
+  <text x="736" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#7030a0">Sector 3</text>
+  <text x="736" y="352" text-anchor="middle" font-size="14" fill="#7030a0">270° – 360°</text>
+
+  <!-- Tick marks -->
+  <line x1="18"  y1="360" x2="18"  y2="373" stroke="#333" stroke-width="1.5"/>
+  <line x1="223" y1="360" x2="223" y2="373" stroke="#333" stroke-width="1.5"/>
+  <line x1="428" y1="360" x2="428" y2="373" stroke="#333" stroke-width="1.5"/>
+  <line x1="633" y1="360" x2="633" y2="373" stroke="#333" stroke-width="1.5"/>
+  <line x1="838" y1="360" x2="838" y2="373" stroke="#333" stroke-width="1.5"/>
+  <text x="18"  y="390" text-anchor="middle" font-size="15" fill="#444">0</text>
+  <text x="223" y="390" text-anchor="middle" font-size="15" fill="#444">T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+  <text x="428" y="390" text-anchor="middle" font-size="15" fill="#444">2T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+  <text x="633" y="390" text-anchor="middle" font-size="15" fill="#444">3T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+  <text x="838" y="390" text-anchor="middle" font-size="15" fill="#444">4T<tspan baseline-shift="sub" font-size="11">s</tspan></text>
+
+  <!-- repeats -->
+  <text x="862" y="340" font-size="24" fill="#555">↻</text>
+  <text x="862" y="300" text-anchor="middle" font-size="14" fill="#888" font-style="italic">repeats</text>
+
+  <!-- ═══════════════════════════════════
+       FORMULA BLOCK
+       y=406..590
+       ═══════════════════════════════════ -->
+  <rect x="18" y="406" width="910" height="175" rx="6" fill="#f9f9f9" stroke="#aaa" stroke-width="1.4"/>
+
+  <!-- I_rDBS(i,j,t) = -->
+  <text x="32" y="456" font-size="19" fill="#222">
+    <tspan font-style="italic">I</tspan>
+    <tspan baseline-shift="sub" font-size="13">rDBS</tspan>
+    <tspan>(</tspan><tspan font-style="italic">i</tspan>
+    <tspan>,</tspan><tspan font-style="italic">j</tspan>
+    <tspan>,</tspan><tspan font-style="italic">t</tspan>
+    <tspan>) =</tspan>
+  </text>
+
+  <!-- Prefactor I_0 / 2πσ²_DBS -->
+  <text x="210" y="436" text-anchor="middle" font-size="18" fill="#222" font-style="italic">I</text>
+  <text x="220" y="443" font-size="13" fill="#222">0</text>
+  <line x1="188" y1="446" x2="244" y2="446" stroke="#222" stroke-width="1.5"/>
+  <text x="188" y="466" font-size="16" fill="#222">2π</text>
+  <text x="214" y="466" font-size="16" fill="#222" font-style="italic">σ</text>
+  <text x="226" y="459" font-size="13" fill="#222">2</text>
+  <text x="226" y="471" font-size="13" fill="#222" font-style="italic">DBS</text>
+
+  <!-- · exp -->
+  <text x="252" y="453" font-size="19" fill="#222"> · exp</text>
+
+  <!-- Opening bracket -->
+  <path d="M 308,420 L 297,420 L 297,480 L 308,480"
+        fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Exp fraction numerator -->
+  <text x="415" y="434" text-anchor="middle" font-size="17" fill="#222">
+    <tspan>−((</tspan>
+    <tspan font-style="italic">i</tspan><tspan> − </tspan>
+    <tspan font-style="italic">c</tspan>
+    <tspan baseline-shift="sub" font-size="13">x</tspan>
+    <tspan>)² + (</tspan>
+    <tspan font-style="italic">j</tspan><tspan> − </tspan>
+    <tspan font-style="italic">c</tspan>
+    <tspan baseline-shift="sub" font-size="13">y</tspan>
+    <tspan>)²)</tspan>
+  </text>
+  <!-- Exp fraction bar -->
+  <line x1="302" y1="443" x2="528" y2="443" stroke="#222" stroke-width="1.5"/>
+  <!-- Exp fraction denominator -->
+  <text x="415" y="465" text-anchor="middle" font-size="17" fill="#222">
+    <tspan>2</tspan>
+    <tspan font-style="italic">σ</tspan>
+    <tspan baseline-shift="super" font-size="13">2</tspan>
+    <tspan baseline-shift="sub"   font-size="13">DBS</tspan>
+  </text>
+
+  <!-- Closing bracket -->
+  <path d="M 532,420 L 543,420 L 543,480 L 532,480"
+        fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- · S(θ,t) -->
+  <text x="550" y="453" font-size="19" fill="#cc5500">
+    <tspan> · </tspan>
+    <tspan font-style="italic">S</tspan>
+    <tspan>(</tspan><tspan font-style="italic">θ</tspan>
+    <tspan>,</tspan><tspan font-style="italic">t</tspan>
+    <tspan>)</tspan>
+  </text>
+
+  <!-- Divider -->
+  <line x1="28" y1="492" x2="920" y2="492" stroke="#ddd" stroke-width="1.2"/>
+
+  <!-- S(θ,t) piecewise -->
+  <text x="32" y="522" font-size="18" fill="#222">
+    <tspan font-style="italic">S</tspan>
+    <tspan>(</tspan><tspan font-style="italic">θ</tspan>
+    <tspan>,</tspan><tspan font-style="italic">t</tspan>
+    <tspan>) =</tspan>
+  </text>
+
+  <!-- Curly brace -->
+  <path d="M 128,500 L 117,500 L 117,524 L 109,531 L 117,538 L 117,562 L 128,562"
+        fill="none" stroke="#222" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Case 1 -->
+  <text x="136" y="518" font-size="17" fill="#222">
+    <tspan font-weight="bold">1</tspan>
+    <tspan>   if </tspan>
+    <tspan font-style="italic">θ</tspan>
+    <tspan> falls within the active sector at time </tspan>
+    <tspan font-style="italic">t</tspan>
+    <tspan>  (sector rotates every T</tspan>
+    <tspan baseline-shift="sub" font-size="13">s</tspan>
+    <tspan> = 50 ms,  f</tspan>
+    <tspan baseline-shift="sub" font-size="13">rot</tspan>
+    <tspan> = 5 Hz)</tspan>
+  </text>
+
+  <!-- Case 2 -->
+  <text x="136" y="552" font-size="17" fill="#222">
+    <tspan font-weight="bold">0</tspan>
+    <tspan>   otherwise</tspan>
+  </text>
+
+</svg>
+
+<script>
+const ns = 'http://www.w3.org/2000/svg';
+const N = 16, cell = 11;
+const half = N / 2;
+
+const gridOrigins = [
+  {x: 18,  y: 58},
+  {x: 210, y: 58},
+  {x: 402, y: 58},
+  {x: 594, y: 58}
+];
+
+const sectorQuads = [
+  {rMin:0, rMax:8, cMin:0, cMax:8},
+  {rMin:8, rMax:16,cMin:0, cMax:8},
+  {rMin:8, rMax:16,cMin:8, cMax:16},
+  {rMin:0, rMax:8, cMin:8, cMax:16}
+];
+
+const activeColors = ['#2255aa', '#cc5500', '#1a6e1a', '#7030a0'];
+const c_idx = 7, sigma = 4;
+const gridsG = document.getElementById('grids');
+
+const hexBase = {
+  '#2255aa': [34,85,170],
+  '#cc5500': [204,85,0],
+  '#1a6e1a': [26,110,26],
+  '#7030a0': [112,48,160]
+};
+
+gridOrigins.forEach((origin, sectorIdx) => {
+  const quad = sectorQuads[sectorIdx];
+  const col  = activeColors[sectorIdx];
+
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      const isActive = i >= quad.rMin && i < quad.rMax && j >= quad.cMin && j < quad.cMax;
+      let fill;
+      if (isActive) {
+        const w = Math.exp(-((i-c_idx)**2+(j-c_idx)**2)/(2*sigma**2));
+        const [r0,g0,b0] = hexBase[col];
+        fill = `rgb(${Math.round(255-(255-r0)*w)},${Math.round(255-(255-g0)*w)},${Math.round(255-(255-b0)*w)})`;
+      } else {
+        fill = '#f0f0f0';
+      }
+      const rect = document.createElementNS(ns,'rect');
+      rect.setAttribute('x', origin.x + j*cell);
+      rect.setAttribute('y', origin.y + i*cell);
+      rect.setAttribute('width', cell);
+      rect.setAttribute('height', cell);
+      rect.setAttribute('fill', fill);
+      rect.setAttribute('stroke','#ccc');
+      rect.setAttribute('stroke-width','0.3');
+      gridsG.appendChild(rect);
+    }
+  }
+
+  // Outer border
+  const border = document.createElementNS(ns,'rect');
+  border.setAttribute('x', origin.x); border.setAttribute('y', origin.y);
+  border.setAttribute('width', N*cell); border.setAttribute('height', N*cell);
+  border.setAttribute('fill','none'); border.setAttribute('stroke', col);
+  border.setAttribute('stroke-width','2.5');
+  gridsG.appendChild(border);
+
+  // Divider lines
+  const mid = half*cell;
+  const vl = document.createElementNS(ns,'line');
+  vl.setAttribute('x1',origin.x+mid); vl.setAttribute('y1',origin.y);
+  vl.setAttribute('x2',origin.x+mid); vl.setAttribute('y2',origin.y+N*cell);
+  vl.setAttribute('stroke','#888'); vl.setAttribute('stroke-width','1.2');
+  gridsG.appendChild(vl);
+
+  const hl = document.createElementNS(ns,'line');
+  hl.setAttribute('x1',origin.x); hl.setAttribute('y1',origin.y+mid);
+  hl.setAttribute('x2',origin.x+N*cell); hl.setAttribute('y2',origin.y+mid);
+  hl.setAttribute('stroke','#888'); hl.setAttribute('stroke-width','1.2');
+  gridsG.appendChild(hl);
+
+  // Active quadrant highlight
+  const hx = origin.x + quad.cMin*cell;
+  const hy = origin.y + quad.rMin*cell;
+  const hi = document.createElementNS(ns,'rect');
+  hi.setAttribute('x',hx); hi.setAttribute('y',hy);
+  hi.setAttribute('width',(quad.cMax-quad.cMin)*cell);
+  hi.setAttribute('height',(quad.rMax-quad.rMin)*cell);
+  hi.setAttribute('fill','none'); hi.setAttribute('stroke',col);
+  hi.setAttribute('stroke-width','3');
+  gridsG.appendChild(hi);
+});
+</script>
+</body>
+</html>

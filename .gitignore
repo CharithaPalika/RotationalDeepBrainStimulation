@@ -1,5 +1,6 @@
 # Ignore everything inside the data folder
 /results/stn_gpe_system/data/**
+/results/temp/**
 /temp/**
 
 # Allow Git to look inside these subfolders

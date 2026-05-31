@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; display: flex; justify-content: center; padding: 40px; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 900 480" width="900" height="480"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="Georgia, 'Times New Roman', serif">
+
+  <defs>
+    <linearGradient id="cbar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#cc2200"/>
+      <stop offset="50%"  stop-color="#f0a000"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <marker id="ah-blk" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="#333"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="480" fill="#fff"/>
+
+  <!-- ═══════════════════════════════════════════
+       GRID  16×16, cell=20px
+       Origin x=60, y=60  → total 320×320
+       ═══════════════════════════════════════════ -->
+  <g id="grid-cells"></g>
+
+  <!-- Grid outer border -->
+  <rect x="60" y="60" width="320" height="320" fill="none" stroke="#555" stroke-width="2"/>
+
+  <!-- Electrode needle at (c,c) = pixel (210,210) -->
+  <polygon points="206,0 214,0 212,200 210,208 209,201"
+           fill="#666" stroke="#333" stroke-width="1"
+           transform="rotate(15, 210, 208)"/>
+  <rect x="203" y="0" width="14" height="10" rx="3"
+        fill="#888" stroke="#333" stroke-width="1"
+        transform="rotate(15, 210, 208)"/>
+  <circle cx="210" cy="208" r="2.5" fill="#111" stroke="#333" stroke-width="1"
+          transform="rotate(15, 210, 208)"/>
+
+  <!-- (c,c) label -->
+  <!-- <text x="222" y="220" font-size="16" fill="#111" font-style="italic" font-weight="bold">(c, c)</text> -->
+<text x="222" y="220" font-size="18" font-style="italic" font-weight="bold">
+  <tspan>(</tspan>
+  <tspan font-style="italic">c</tspan>
+  <tspan baseline-shift="sub" font-size="14">x</tspan>
+  <tspan>, </tspan>
+  <tspan font-style="italic">c</tspan>
+  <tspan baseline-shift="sub" font-size="14">y</tspan>
+  <tspan>)</tspan>
+</text>
+  <!-- I_sDBS annotation on a grid point (row=5, col=3)
+       pixel: x=60+3*20+10=130, y=60+5*20+10=170 -->
+  <!-- <rect x="121" y="161" width="18" height="18" fill="none" stroke="#333" stroke-width="1.8"/>
+  <line x1="130" y1="179" x2="130" y2="212" stroke="#333" stroke-width="1.3"/>
+  <rect x="68" y="212" width="128" height="30" rx="4" fill="#fffff0" stroke="#333" stroke-width="1"/>
+  <text x="132" y="231" text-anchor="middle" font-size="13" fill="#333">
+    <tspan font-style="italic">I</tspan>
+    <tspan baseline-shift="sub" font-size="10">sDBS</tspan>
+    <tspan> = </tspan>
+    <tspan font-style="italic">I</tspan>
+    <tspan baseline-shift="sub" font-size="10">0</tspan>
+    <tspan>(t) · w(i,j)</tspan>
+  </text> -->
+
+  <!-- axis labels only — no index numbers -->
+  <text x="220" y="400" text-anchor="middle" font-size="16" fill="#555" font-style="italic">j →</text>
+  <text x="28"  y="220" text-anchor="middle" font-size="16" fill="#555" font-style="italic"
+        transform="rotate(-90,28,220)">i →</text>
+
+  <!-- ═══════════════════════════════════════════
+       COLOUR BAR  x=408..422, y=60..380
+       ═══════════════════════════════════════════ -->
+  <rect x="408" y="60" width="14" height="320" fill="url(#cbar)" stroke="#888" stroke-width="1"/>
+  <text x="405" y="64"  text-anchor="end" font-size="14" fill="#333">1</text>
+  <text x="405" y="222" text-anchor="end" font-size="14" fill="#333">0.5</text>
+  <text x="405" y="382" text-anchor="end" font-size="14" fill="#333">0</text>
+  <text x="434" y="220" text-anchor="middle" font-size="16" 
+        transform="rotate(90,434,220)">w(i,j)</text>
+
+  <!-- ═══════════════════════════════════════════
+       RIGHT PANEL — formula box centred vertically
+       Panel x=450, viewBox height=480
+       Formula box height=140, centred → y=(480-140)/2=170
+       ═══════════════════════════════════════════ -->
+
+  <!-- Formula box centred at y=170, height=140 -->
+  <rect x="452" y="155" width="432" height="148" rx="6"
+        fill="#f9f9f9" stroke="#aaa" stroke-width="1.4"/>
+
+  <!-- w(i,j) = -->
+  <text x="465" y="210" font-size="19" fill="#333">
+    <tspan font-style="italic">w</tspan>
+    <tspan>(</tspan>
+    <tspan font-style="italic">i</tspan>
+    <tspan>,</tspan>
+    <tspan font-style="italic">j</tspan>
+    <tspan>) =</tspan>
+  </text>
+
+  <!-- Prefactor fraction: 1 / 2πσ²_DBS -->
+  <!-- numerator: 1 -->
+  <text x="582" y="192" text-anchor="middle" font-size="17" fill="#333">1</text>
+  <!-- fraction bar -->
+  <line x1="563" y1="197" x2="606" y2="197" stroke="#333" stroke-width="1.3"/>
+  <!-- denominator: 2πσ²_DBS -->
+  <text x="563" y="214" font-size="14" fill="#333">2π</text>
+  <text x="585" y="214" font-size="14" fill="#333" font-style="italic">σ</text>
+  <text x="595" y="208" font-size="11" fill="#333">2</text>
+  <text x="595" y="219" font-size="11" fill="#333" font-style="italic">DBS</text>
+
+  <!-- · exp -->
+  <text x="618" y="207" font-size="18" fill="#333"> · exp</text>
+
+  <!-- Opening bracket -->
+  <path d="M 672,170 L 662,170 L 662,228 L 672,228"
+        fill="none" stroke="#333" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Exp fraction numerator -->
+  <text x="755" y="186" text-anchor="middle" font-size="16" fill="#333">
+    <tspan>−((</tspan>
+    <tspan font-style="italic">i</tspan>
+    <tspan> − </tspan>
+    <tspan font-style="italic">c</tspan>
+    <tspan baseline-shift="sub" font-size="12">x</tspan>
+    <tspan>)² + (</tspan>
+    <tspan font-style="italic">j</tspan>
+    <tspan> − </tspan>
+    <tspan font-style="italic">c</tspan>
+    <tspan baseline-shift="sub" font-size="12">y</tspan>
+    <tspan>)²)</tspan>
+  </text>
+  <!-- Exp fraction bar -->
+  <line x1="667" y1="198" x2="843" y2="198" stroke="#333" stroke-width="1.3"/>
+  <!-- Exp fraction denominator -->
+  <text x="755" y="215" text-anchor="middle" font-size="16" fill="#333">
+    <tspan>2</tspan>
+    <tspan font-style="italic">σ</tspan>
+    <tspan baseline-shift="super" font-size="12">2</tspan>
+    <tspan baseline-shift="sub"   font-size="12">DBS</tspan>
+  </text>
+
+  <!-- Closing bracket -->
+  <path d="M 847,170 L 857,170 L 857,228 L 847,228"
+        fill="none" stroke="#333" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Divider -->
+  <!-- <line x1="462" y1="240" x2="876" y2="240" stroke="#ddd" stroke-width="1"/> -->
+
+  <!-- I_sDBS line -->
+  <text x="545" y="272" font-size="19" fill="#333">
+    <tspan font-style="italic">I</tspan>
+    <tspan baseline-shift="sub" font-size="12">sDBS</tspan>
+    <tspan>(</tspan>
+    <tspan font-style="italic">i</tspan>
+    <tspan> , </tspan>
+    <tspan font-style="italic">j</tspan>
+    <tspan>) = </tspan>
+    <tspan font-style="italic">I</tspan>
+    <tspan baseline-shift="sub" font-size="12">0</tspan>
+    <tspan>(t) · w(</tspan>
+    <tspan font-style="italic">i</tspan>
+    <tspan> , </tspan>
+    <tspan font-style="italic">j</tspan>
+    <tspan>)</tspan>
+  </text>
+
+
+</svg>
+
+<script>
+const ns = 'http://www.w3.org/2000/svg';
+const N = 16, cell = 20, ox = 60, oy = 60;
+const c = 7, sigma = 4;
+const gridG = document.getElementById('grid-cells');
+
+for (let i = 0; i < N; i++) {
+  for (let j = 0; j < N; j++) {
+    const w = Math.exp(-((i-c)**2 + (j-c)**2) / (2 * sigma**2));
+    const r = Math.round(255 - (255 - 204) * w);
+    const g = Math.round(255 - (255 -  34) * w);
+    const b = Math.round(255 -  255        * w);
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', ox + j * cell);
+    rect.setAttribute('y', oy + i * cell);
+    rect.setAttribute('width',  cell);
+    rect.setAttribute('height', cell);
+    rect.setAttribute('fill', `rgb(${r},${g},${b})`);
+    rect.setAttribute('stroke', '#ccc');
+    rect.setAttribute('stroke-width', '0.4');
+    gridG.appendChild(rect);
+  }
+}
+</script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 /results/stn_gpe_system/data/**
 /results/temp/**
 /temp/**
+/temp/temp.yaml
+
 
 # Allow Git to look inside these subfolders
 !/results/stn_gpe_system/data/

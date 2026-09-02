@@ -35,4 +35,4 @@ t_sector_activation : 100 #* 0.1 ms
 # DBS Spread
 center : 7
 spread_amplitude : 1 
-sigma : 3
+sigma : 5

@@ -3,6 +3,7 @@
 /results/temp/**
 /temp/**
 /temp/temp.yaml
+Rotational_DBS_paper draft.pdf
 
 
 # Allow Git to look inside these subfolders
@@ -25,3 +26,4 @@
 /basal_ganglia/BGnetwork_old.py
 /envs/prob_reversal_learning_old.py
 **/__pycache__/
+
